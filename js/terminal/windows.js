@@ -977,6 +977,7 @@
   App.WindowsOS = {
     name: "windows",
     cls: "win",
+    blankAfter: true,
     title: "Administrator: Command Prompt",
     commands: COMMANDS,
     banner: () => [["Microsoft Windows [Version 10.0.26100.2033]"], ["(c) Microsoft Corporation. All rights reserved."], [""], ["Type HELP for a list of commands, or COMMAND /? for help on one.", "t-dim"], [""]],

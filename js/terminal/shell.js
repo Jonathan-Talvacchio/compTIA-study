@@ -97,9 +97,12 @@
     const bar = h("div", { class: "term-bar" },
       h("span", { class: "dot", style: { background: "#ff5f56" } }), h("span", { class: "dot", style: { background: "#ffbd2e" } }), h("span", { class: "dot", style: { background: "#27c93f" } }),
       h("span", { style: { marginLeft: "8px" } }, os.title));
-    const el = h("div", { class: "terminal " + os.cls }, bar, out, line);
+    // Output and the live prompt share one scrolling screen, so the prompt follows the last line of output.
+    const screen = h("div", { class: "term-screen" }, out, line);
+    const el = h("div", { class: "terminal " + os.cls }, bar, screen);
     container.appendChild(el);
     el.addEventListener("click", () => { if (!window.getSelection().toString()) input.focus(); });
+    const scroll = () => { screen.scrollTop = screen.scrollHeight; };
 
     const history = [];
     let hIdx = 0, busy = false, buffer = [];
@@ -111,9 +114,9 @@
         // pre-wrap drops a trailing newline and empty divs collapse, so pad them to keep blank lines visible
         span.textContent = s === "" ? " " : s.endsWith("\n") ? s + "\n" : s;
         out.appendChild(span);
-        out.scrollTop = out.scrollHeight;
+        scroll();
       },
-      html(markup) { const d = h("div", { html: markup }); buffer.push(d.textContent); out.appendChild(d); out.scrollTop = out.scrollHeight; },
+      html(markup) { const d = h("div", { html: markup }); buffer.push(d.textContent); out.appendChild(d); scroll(); },
       clear() { out.innerHTML = ""; },
       sleep: ms => new Promise(r => setTimeout(r, ms)),
       setPromptOverride(p) { world.__prompt = p; },
@@ -140,7 +143,7 @@
       if (cmdLine.trim()) { history.push(cmdLine); }
       hIdx = history.length;
       busy = true;
-      line.style.visibility = "hidden";
+      line.style.display = "none";
       buffer = [];
       try {
         await os.exec(cmdLine, io, world);
@@ -148,10 +151,12 @@
         io.out("Simulator error: " + e.message, "t-err");
         console.error(e);
       }
+      // cmd.exe prints a blank line between a command's output and the next prompt
+      if (os.blankAfter && cmdLine.trim() && out.lastChild && out.lastChild.textContent.trim()) io.out("");
       busy = false;
-      line.style.visibility = "visible";
+      line.style.display = "";
       drawPrompt();
-      out.scrollTop = out.scrollHeight;
+      scroll();
       input.focus();
       if (onCommand && cmdLine.trim()) onCommand(cmdLine.trim(), buffer.join("\n"));
     }
