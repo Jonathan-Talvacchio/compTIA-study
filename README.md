@@ -22,7 +22,7 @@ It's a static site: plain HTML, CSS and JavaScript, with no build step and no se
 | **Exam Simulator** | Timed 20/45/90-question exams, drawn in proportion to the domain weights. Includes flag-for-review, a scaled 100–900 score estimate, and a domain breakdown plus a full answer review. |
 | **Flashcards** | 272 cards using spaced repetition (SM-2 style). Modes: Smart Review, Cram, and Type-It (active recall). Many cards include mnemonics. |
 | **Arcade** | Port Match (timed), Put It In Order (troubleshooting steps, malware removal, laser printing, DORA, OSI…), Sort It Out (Wi-Fi bands, RAID, malware types, cloud models, tools…), Memory Match, Tech Blitz (true/false), Acronym Attack. |
-| **Terminal Lab** | Simulated Windows CMD and Linux bash. Free play, plus 12 ticket-style missions: APIPA/DHCP, malware hunt with netstat/taskkill/sfc, Group Policy, DiskPart, least-privilege accounts, tracert/pathping, chmod/chown, log forensics with grep/find, apt, runaway processes, disk full, and DNS failure. |
+| **Terminal Lab** | Simulated Windows CMD and Linux bash with a working `nano`/Notepad editor. **Academy:** 11 guided lessons that teach one command at a time. **Command Drill:** type the exact command for a task (60 tasks, graded on syntax). **Missions:** 16 ticket-style scenarios, including APIPA/DHCP, a malware hunt, a hosts-file hijack, Group Policy, DiskPart, robocopy backups, least privilege, tracert/pathping, chmod/chown, log forensics, apt, runaway processes, a full disk, a DNS fix, a USB drive repair with fsck/mount, and a crashed web service. **Free Play:** a sandbox with a searchable command guide. |
 | **Study Lab** | Pomodoro timer, a Feynman-style teach-back mode (40 prompts with key-point self-checks), a daily goal setting, and a suggested study plan. |
 | **Cheat Sheets** | Searchable tables: ports, Wi-Fi, RAID, cabling, Windows tools and commands, Linux commands, file systems, cloud, security, operational procedures, and mnemonics. |
 | **Progress** | Badges, personal bests, exam history, and progress export/import/reset. |
@@ -37,7 +37,8 @@ data/                 content: exams.js (blueprints), core1/core2 questions, fla
 js/core.js            state, XP/levels/badges, spaced repetition, router, DOM helper
 js/views/             one file per page
 js/games/             arcade games
-js/terminal/          shell engine + virtual FS (shell.js), windows.js, linux.js, missions.js
+js/terminal/          shell engine + virtual FS + editor (shell.js), windows.js, linux.js,
+                      missions.js, learn.js (lessons, drills, command guide)
 ```
 
 ### Adding content

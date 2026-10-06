@@ -51,6 +51,11 @@
       net: { iface: "eth0", ip: "192.168.1.80", cidr: 24, gw: "192.168.1.1", mac: "08:00:27:4e:66:a1", up: true, internet: true },
       dnsTable: { "comptia.org": "104.18.30.99", "www.comptia.org": "104.18.30.99", "google.com": "142.250.72.14", "fileserver": "192.168.1.20", "archive.ubuntu.com": "91.189.91.82", "dc01.corp.local": "192.168.1.10" },
       dnsWorks: true,
+      blockDevices: [
+        { name: "sda", size: "50G", rm: 0, parts: [
+          { name: "sda1", size: "1.1G", fs: "vfat", mount: "/boot/efi" },
+          { name: "sda2", size: "48.9G", fs: "ext4", mount: "/" }] }
+      ],
       processes: [
         { pid: 1, user: "root", cpu: 0.0, mem: 0.3, cmd: "/sbin/init" },
         { pid: 412, user: "root", cpu: 0.0, mem: 0.2, cmd: "/lib/systemd/systemd-journald" },
@@ -125,11 +130,15 @@
     passwd: "passwd - change user password",
     mkdir: "mkdir - make directories (-p creates parents)", touch: "touch - create empty file / update timestamp",
     whoami: "whoami - print effective user name", history: "history - list previously entered commands",
+    fsck: "fsck - check and repair a Linux file system\n  sudo fsck /dev/sdb1      (the partition must be unmounted)\n  sudo fsck -y /dev/sdb1   (answer yes to every repair)",
+    mount: "mount - attach a file system to a directory\n  mount                         list what's mounted\n  sudo mount /dev/sdb1 /mnt/data\n  Permanent mounts go in /etc/fstab.",
+    umount: "umount - detach a file system:  sudo umount /mnt/data",
+    lsblk: "lsblk - list block devices (disks and partitions).  lsblk -f adds file system types.",
     uname: "uname - print system information (-a for all)", head: "head - output the first lines of files (-n N)", tail: "tail - output the last lines of files (-n N, -f follow)"
   };
   const COMMANDS = ["apt", "apt-get", "cat", "cd", "chmod", "chown", "clear", "cp", "curl", "df", "dig", "dnf", "du", "echo", "exit", "find", "grep", "head", "help",
     "history", "hostname", "id", "ifconfig", "ip", "kill", "less", "ls", "man", "mkdir", "more", "mv", "nano", "nslookup", "passwd", "ping", "ps", "pwd", "rm", "rmdir",
-    "su", "sudo", "systemctl", "tail", "top", "touch", "traceroute", "uname", "wc", "whoami"];
+    "fsck", "mount", "umount", "lsblk", "su", "sudo", "systemctl", "tail", "top", "touch", "traceroute", "uname", "wc", "whoami"];
 
   const C = {};
   C.help = (a, io) => io.out("Simulated bash. Commands: " + COMMANDS.join(", ") + "\nUse 'man COMMAND' for help. Pipes (|) to grep/wc/head/tail/sort and redirects (> >>) work.", "t-info");
@@ -190,18 +199,39 @@
     if (!can(w, n, "r")) { io.out(`${cmd}: ${t}: Permission denied`, "t-err"); return null; }
     return n.content;
   }
-  C.cat = C.less = C.more = (a, io, w, cmd) => { if (!a.length) { io.out("(Simulator) cat needs a file name.", "t-dim"); return; } for (const t of a) { const c = readFile(w, io, cmd || "cat", t); if (c != null) io.out(c); } };
-  C.nano = C.vi = C.vim = (a, io, w) => {
-    if (!a[0]) { io.out("(Simulator) nano needs a file name.", "t-dim"); return; }
-    const c = readFile(w, io, "nano", a[0]);
-    if (c == null) return;
-    io.out(`  GNU nano 7.2                ${a[0]}\n${"-".repeat(50)}`, "t-info");
-    io.out(c);
-    io.out(`${"-".repeat(50)}\n(Simulator) Editing isn't supported — viewing only. ^X Exit`, "t-dim");
+  C.cat = C.less = C.more = (a, io, w, cmd, stdin) => {
+    if (!a.length) { if (stdin != null) io.out(stdin); else io.out("(Simulator) cat needs a file name.", "t-dim"); return; }
+    for (const t of a) { const c = readFile(w, io, cmd || "cat", t); if (c != null) io.out(c); }
+  };
+  C.nano = C.vi = C.vim = async (a, io, w, cmd) => {
+    const file = a.find(x => !x.startsWith("-"));
+    if (!file) { io.out("(Simulator) Give nano a file name, e.g. nano notes.txt", "t-dim"); return; }
+    const p = parsePath(w, file);
+    const node = w.fs.get(p);
+    if (node && node.type === "dir") { io.out(`"${file}" is a directory`, "t-err"); return; }
+    if (node && !can(w, node, "r")) { io.out(`[ Error reading ${file}: Permission denied ]`, "t-err"); return; }
+    if (!node && !w.fs.parentOf(p)) { io.out(`[ Directory '${pathStr(p.slice(0, -1))}' does not exist ]`, "t-err"); return; }
+    if (cmd !== "nano") io.out(`(Simulator: ${cmd} isn't simulated, so nano opens instead.)`, "t-dim");
+    const editor = w.user;
+    await io.edit({
+      kind: "nano", name: file, content: node ? node.content : "",
+      save(text) {
+        const existing = w.fs.get(p), parent = w.fs.parentOf(p);
+        const asUser = w.user; w.user = editor;
+        const ok = existing ? can(w, existing, "w") : can(w, parent, "w");
+        w.user = asUser;
+        if (!ok) return "Permission denied";
+        w.fs.write(p, text);
+        if (!existing) { const nn = w.fs.get(p); nn.owner = nn.group = editor; }
+        w.flags.edited = (w.flags.edited || []).concat(pathStr(p));
+        return null;
+      }
+    });
   };
   C.head = C.tail = (a, io, w, cmd) => {
     const ni = a.indexOf("-n"); const n = ni >= 0 ? parseInt(a[ni + 1], 10) : 10;
-    const file = a.filter((x, i) => !x.startsWith("-") && i !== ni + 1)[0];
+    const file = a.filter((x, i) => !x.startsWith("-") && !(ni >= 0 && i === ni + 1))[0];
+    if (!file) { io.out(`${cmd}: missing file name (e.g. ${cmd} -n 5 /var/log/syslog)`, "t-err"); return; }
     const c = file && readFile(w, io, cmd, file);
     if (c == null) return;
     const lines = c.split("\n");
@@ -440,6 +470,7 @@
     io.out(`tmpfs          ${hu ? "  794M  1.6M  792M" : "   813020     1640    811380"}   1% /run`);
     io.out(`/dev/sda2      ${hu ? fmt(size).padStart(5) + " " + fmt(used).padStart(5) + " " + fmt(avail).padStart(5) : fmt(size).padStart(9) + " " + fmt(used).padStart(8) + " " + fmt(avail).padStart(9)} ${(pct + "%").padStart(4)} /`, pct > 90 ? "t-err" : "");
     io.out(`/dev/sda1      ${hu ? "  1.1G  6.1M  1.1G" : "  1098632     6220   1092412"}   1% /boot/efi`);
+    for (const d of w.blockDevices) for (const pt of d.parts) if (pt.mount && pt.used) io.out(`/dev/${pt.name.padEnd(9)} ${hu ? pt.size.padStart(5) + " " + pt.used.padStart(5) + " " + pt.avail.padStart(5) : "   (sizes in 1K blocks omitted)"} ${pt.pct.padStart(4)} ${pt.mount}`);
     w.flags.df = (w.flags.df || 0) + 1;
     w.flags.dfPct = pct;
   };
@@ -503,6 +534,79 @@
   };
   C.dnf = C.yum = (a, io) => io.out("bash: dnf: command not found\n(This is an Ubuntu/Debian system — use apt. dnf/yum are for Red Hat-based distros like Fedora, RHEL and Rocky.)", "t-err");
 
+  // block devices: lsblk, mount, umount, fsck
+  function findPart(w, dev) {
+    const name = (dev || "").replace(/^\/dev\//, "");
+    for (const d of w.blockDevices) for (const pt of d.parts) if (pt.name === name) return pt;
+    return null;
+  }
+  C.lsblk = (a, io, w) => {
+    const showFs = a.includes("-f");
+    io.out(showFs ? "NAME   FSTYPE LABEL   MOUNTPOINTS" : "NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS");
+    w.blockDevices.forEach((d, di) => {
+      io.out(showFs ? d.name : `${d.name.padEnd(6)} 8:${String(di * 16).padEnd(4)} ${d.rm}  ${d.size.padStart(5)}  0 disk `);
+      d.parts.forEach((pt, i) => {
+        const br = i === d.parts.length - 1 ? "└─" : "├─";
+        io.out(showFs ? `${br}${pt.name.padEnd(5)}${(pt.fs || "").padEnd(7)}${(pt.label || "").padEnd(8)}${pt.mount || ""}` : `${br}${pt.name.padEnd(5)} 8:${String(di * 16 + i + 1).padEnd(4)} ${d.rm}  ${pt.size.padStart(5)}  0 part ${pt.mount || ""}`);
+      });
+    });
+    w.flags.lsblk = true;
+  };
+  C.mount = (a, io, w) => {
+    const args = a.filter(x => !x.startsWith("-"));
+    if (!args.length) {
+      io.out("sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)\nproc on /proc type proc (rw,nosuid,nodev,noexec,relatime)");
+      for (const d of w.blockDevices) for (const pt of d.parts) if (pt.mount) io.out(`/dev/${pt.name} on ${pt.mount} type ${pt.fs} (rw,relatime)`);
+      return;
+    }
+    if (args.length < 2) { io.out("mount: bad usage\nTry 'mount --help' for more information. (Usage: mount DEVICE DIRECTORY)", "t-err"); return; }
+    const [dev, dir] = args;
+    if (w.user !== "root") { io.out(`mount: ${dir}: must be superuser to use mount.`, "t-err"); return; }
+    const pt = findPart(w, dev);
+    if (!pt) { io.out(`mount: ${dir}: special device ${dev} does not exist.`, "t-err"); return; }
+    const dp = parsePath(w, dir), target = w.fs.get(dp);
+    if (!target || target.type !== "dir") { io.out(`mount: ${dir}: mount point does not exist.`, "t-err"); return; }
+    if (pt.mount) { io.out(`mount: ${dir}: ${dev} already mounted on ${pt.mount}.`, "t-err"); return; }
+    if (pt.dirty) { io.out(`mount: ${dir}: can't read superblock on ${dev}.\n       dmesg(1) may have more information after failed mount system call.`, "t-err"); w.flags.mountFailed = true; return; }
+    pt.saved = target.children;
+    target.children = new App.VFS(pt.files || {}).root.children;
+    pt.mount = pathStr(dp);
+    w.flags.mounted = (w.flags.mounted || []).concat(pt.mount);
+  };
+  C.umount = (a, io, w) => {
+    const arg = a.find(x => !x.startsWith("-"));
+    if (!arg) { io.out("umount: bad usage", "t-err"); return; }
+    if (w.user !== "root") { io.out(`umount: ${arg}: must be superuser to unmount.`, "t-err"); return; }
+    let pt = findPart(w, arg);
+    if (!pt) { const abs = pathStr(parsePath(w, arg)); for (const d of w.blockDevices) for (const x of d.parts) if (x.mount === abs) pt = x; }
+    if (!pt || !pt.mount) { io.out(`umount: ${arg}: not mounted.`, "t-err"); return; }
+    if (pt.mount === "/" || pt.mount === "/boot/efi") { io.out(`umount: ${pt.mount}: target is busy.`, "t-err"); return; }
+    if (w.cwd.length && pathStr(w.cwd).startsWith(pt.mount)) { io.out(`umount: ${pt.mount}: target is busy.`, "t-err"); return; }
+    const target = w.fs.get(pt.mount.split("/").filter(Boolean));
+    pt.files = null;
+    if (target) target.children = pt.saved || {};
+    pt.mount = null;
+    w.flags.unmounted = true;
+  };
+  C.fsck = async (a, io, w) => {
+    const dev = a.find(x => !x.startsWith("-"));
+    io.out("fsck from util-linux 2.39.3");
+    if (!dev) { io.out("Usage: fsck [-y] DEVICE", "t-err"); return; }
+    const pt = findPart(w, dev);
+    if (!pt) { io.out(`fsck.ext4: No such file or directory while trying to open ${dev}`, "t-err"); return; }
+    if (w.user !== "root") { io.out(`e2fsck 1.47.0 (5-Feb-2023)\nfsck.ext4: Permission denied while trying to open ${dev}\nYou must have r/w access to the filesystem or be root`, "t-err"); return; }
+    if (pt.mount) { io.out(`e2fsck 1.47.0 (5-Feb-2023)\n${dev} is mounted.\ne2fsck: Cannot continue, aborting.`, "t-err"); return; }
+    if (!pt.dirty) { io.out(`${dev}: clean, 1243/3907584 files, 3021455/15627008 blocks`); w.flags.fsck = dev; return; }
+    const yes = a.some(x => /^-.*[ya]/.test(x));
+    io.out(`e2fsck 1.47.0 (5-Feb-2023)\n${pt.label || "data"} contains a file system with errors, check forced.`);
+    const steps = ["Pass 1: Checking inodes, blocks, and sizes", "Inode 131074 has illegal block(s).  Clear? yes", "Pass 2: Checking directory structure", "Pass 3: Checking directory connectivity", "Pass 4: Checking reference counts", "Pass 5: Checking group summary information", "Free blocks count wrong for group #0 (2345, counted=2341).\nFix? yes"];
+    for (const st of steps) { await io.sleep(300); io.out(st); }
+    if (!yes) io.out("(Simulator answered 'yes' to each repair prompt. Use fsck -y to do that automatically.)", "t-dim");
+    io.out(`\n${pt.label || "data"}: ***** FILE SYSTEM WAS MODIFIED *****\n${pt.label || "data"}: 1243/3907584 files (0.4% non-contiguous), 3021455/15627008 blocks`, "t-ok");
+    pt.dirty = false;
+    w.flags.fsck = dev;
+  };
+
   // network
   C.ip = (a, io, w) => {
     const sub = (a[0] || "").toLowerCase();
@@ -528,15 +632,39 @@
     if (!w.packages.installed.includes("net-tools")) { io.out("Command 'ifconfig' not found, but can be installed with:\nsudo apt install net-tools\n(Tip: modern distros use 'ip addr' instead.)", "t-err"); return; }
     io.out(`${w.net.iface}: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500\n        inet ${w.net.ip}  netmask 255.255.255.0  broadcast 192.168.1.255\n        ether ${w.net.mac}  txqueuelen 1000  (Ethernet)`);
   };
+  // The first nameserver in /etc/resolv.conf decides whether name lookups work.
+  const PUBLIC_DNS = ["8.8.8.8", "8.8.4.4", "1.1.1.1", "1.0.0.1", "9.9.9.9", "192.168.1.10"];
+  function nameserver(w) {
+    const f = w.fs.get(["etc", "resolv.conf"]);
+    const m = f && f.content.match(/^\s*nameserver\s+(\S+)/m);
+    return m ? m[1] : null;
+  }
+  function dnsOk(w, server) {
+    if (!w.net.up) return false;
+    const ns = server || nameserver(w);
+    if (!ns || !PUBLIC_DNS.includes(ns) || ns === w.badDns) return false;
+    return w.badDns ? true : w.dnsWorks;
+  }
+  function hostsLookup(w, name) {
+    if (name.toLowerCase() === "localhost") return "127.0.0.1";
+    const f = w.fs.get(["etc", "hosts"]);
+    for (const line of (f ? f.content : "").split("\n")) {
+      const parts = line.replace(/#.*/, "").trim().split(/\s+/);
+      if (parts.length > 1 && parts.slice(1).some(n => n.toLowerCase() === name.toLowerCase())) return parts[0];
+    }
+    return null;
+  }
   function resolveL(w, name) {
     if (/^\d+\.\d+\.\d+\.\d+$/.test(name)) return name;
-    if (!w.net.up || !w.dnsWorks) return null;
+    const local = hostsLookup(w, name);
+    if (local) return local;
+    if (!dnsOk(w)) return null;
     return w.dnsTable[name.toLowerCase()] || null;
   }
   function reachL(w, ip) {
     if (!w.net.up) return false;
     if (ip.startsWith("127.") || ip === w.net.ip) return true;
-    if (ip.startsWith("192.168.1.")) return ["192.168.1.1", "192.168.1.10", "192.168.1.20"].includes(ip);
+    if (ip.startsWith("192.168.1.")) return ["192.168.1.1", "192.168.1.10", "192.168.1.20", "192.168.1.25"].includes(ip);
     return w.net.internet;
   }
   C.ping = async (a, io, w) => {
@@ -566,8 +694,8 @@
     const type = (rest[1] || "A").toUpperCase();
     if (!name) { io.out("(Simulator) usage: dig [@server] name [type]", "t-dim"); return; }
     await io.sleep(300);
-    const usedServer = server || (w.fs.get(["etc", "resolv.conf"]).content.match(/nameserver\s+(\S+)/) || [])[1] || "127.0.0.53";
-    const working = w.net.up && (server ? server !== w.badDns : w.dnsWorks);
+    const usedServer = server || nameserver(w) || "127.0.0.53";
+    const working = dnsOk(w, server || null);
     io.out(`\n; <<>> DiG 9.18.28-0ubuntu0.24.04.1-Ubuntu <<>> ${a.join(" ")}\n;; global options: +cmd`);
     if (!working) { io.out(`;; communications error to ${usedServer}#53: timed out\n;; no servers could be reached`, "t-err"); w.flags.digFail = true; return; }
     const ip = w.dnsTable[name.toLowerCase()];
@@ -595,6 +723,15 @@
     const ip = resolveL(w, host);
     await io.sleep(500);
     if (!ip) { io.out(`curl: (6) Could not resolve host: ${host}`, "t-err"); return; }
+    if (ip.startsWith("127.") || ip === w.net.ip) {
+      const port = url.startsWith("https") ? 443 : 80;
+      if (w.services.nginx !== "active") { io.out(`curl: (7) Failed to connect to ${host} port ${port} after 0 ms: Couldn't connect to server`, "t-err"); w.flags.curlLocalFail = true; return; }
+      const page = w.fs.get(["var", "www", "html", "index.html"]);
+      if (a.includes("-I")) io.out(`HTTP/1.1 200 OK\nServer: nginx/1.24.0 (Ubuntu)\nContent-Type: text/html\nDate: ${new Date().toUTCString()}`);
+      else io.out(page ? page.content : "<h1>Welcome to nginx!</h1>");
+      w.flags.curlLocalOk = true; w.flags.curl = host;
+      return;
+    }
     if (!reachL(w, ip)) { io.out(`curl: (28) Failed to connect to ${host} port 443 after 10001 ms: Timeout was reached`, "t-err"); return; }
     if (a.includes("-I")) io.out(`HTTP/2 200\ncontent-type: text/html; charset=UTF-8\nserver: cloudflare\ndate: ${new Date().toUTCString()}`);
     else io.out(`<!DOCTYPE html>\n<html><head><title>${host}</title></head>\n<body>Welcome to ${host}</body></html>`);

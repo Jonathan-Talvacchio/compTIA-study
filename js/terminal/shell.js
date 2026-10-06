@@ -120,8 +120,76 @@
       clear() { out.innerHTML = ""; },
       sleep: ms => new Promise(r => setTimeout(r, ms)),
       setPromptOverride(p) { world.__prompt = p; },
+      edit: opts => openEditor(opts),
       history
     };
+
+    // Full-screen text editor (nano on Linux, Notepad on Windows). Resolves when the user exits.
+    // opts: { kind: "nano"|"notepad", name, content, save(text) -> error string | null }
+    function openEditor({ kind = "nano", name, content = "", save }) {
+      return new Promise(resolve => {
+        const nano = kind === "nano";
+        let saved = content, msg = nano ? `[ Read ${content.split("\n").length} lines ]` : "", confirmExit = false;
+        const ta = h("textarea", { class: "ed-text", spellcheck: "false", autocapitalize: "off", "aria-label": `Editing ${name}` });
+        ta.value = content;
+        const status = h("div", { class: "ed-status" });
+        const head = h("div", { class: "ed-head" }, nano ? `  GNU nano 7.2          ${name}` : `${name} - Notepad`);
+        const btn = (label, fn) => h("button", { class: "ed-key", type: "button", onclick: e => { e.preventDefault(); fn(); } }, label);
+        const keys = nano
+          ? [btn("^O Write Out", writeOut), btn("^X Exit", exit), btn("^K Cut line", cutLine)]
+          : [btn("Save (Ctrl+S)", writeOut), btn("Close", exit)];
+        const foot = h("div", { class: "ed-foot" }, keys);
+        const ed = h("div", { class: "editor " + kind }, head, ta, status, foot);
+        screen.style.display = "none";
+        el.appendChild(ed);
+        drawStatus();
+        setTimeout(() => ta.focus(), 30);
+
+        function drawStatus() {
+          const dirty = ta.value !== saved;
+          status.textContent = confirmExit ? "Save modified buffer?  Y Yes   N No   ^C Cancel" : msg || (dirty ? (nano ? "[ Modified ]" : "Unsaved changes") : "");
+          status.classList.toggle("ask", confirmExit);
+        }
+        function writeOut() {
+          const err = save ? save(ta.value) : null;
+          if (err) { msg = nano ? `[ Error writing ${name}: ${err} ]` : `Error: ${err}`; }
+          else { saved = ta.value; msg = nano ? `[ Wrote ${ta.value.split("\n").length} lines ]` : "Saved"; }
+          drawStatus();
+          return !err;
+        }
+        function exit() {
+          if (ta.value !== saved && !confirmExit) { confirmExit = true; drawStatus(); ta.focus(); return; }
+          close();
+        }
+        function close() {
+          ed.remove();
+          screen.style.display = "";
+          resolve({ saved: saved !== content });
+        }
+        function cutLine() {
+          const v = ta.value, start = v.lastIndexOf("\n", ta.selectionStart - 1) + 1;
+          let end = v.indexOf("\n", ta.selectionStart); end = end === -1 ? v.length : end + 1;
+          ta.value = v.slice(0, start) + v.slice(end);
+          ta.selectionStart = ta.selectionEnd = start;
+          msg = ""; drawStatus(); ta.focus();
+        }
+        ta.addEventListener("input", () => { msg = ""; drawStatus(); });
+        ta.addEventListener("keydown", e => {
+          const k = e.key.toLowerCase();
+          if (confirmExit) {
+            e.preventDefault();
+            if (k === "y") { if (writeOut()) close(); else { confirmExit = false; drawStatus(); } }
+            else if (k === "n") close();
+            else if (k === "c" || k === "escape") { confirmExit = false; drawStatus(); }
+            return;
+          }
+          if (!e.ctrlKey && !e.metaKey) return;
+          if ((nano && k === "o") || (!nano && k === "s")) { e.preventDefault(); writeOut(); }
+          else if (nano && k === "x") { e.preventDefault(); exit(); }
+          else if (nano && k === "k") { e.preventDefault(); cutLine(); }
+        });
+      });
+    }
     const term = { io, el, input, world, focus: () => input.focus(), run };
 
     function drawPrompt() {
