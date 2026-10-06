@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A+ Quest</title>
+  <meta name="description" content="Gamified study site for the CompTIA A+ Core 1 (220-1201) and Core 2 (220-1202) exams.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><div class="logo">A+</div> A+ Quest</div>
+      <nav class="nav">
+        <a href="#/dashboard" data-route="dashboard"><span class="ico">🏠</span> Dashboard</a>
+        <div class="nav-sep">Practice</div>
+        <a href="#/quiz" data-route="quiz"><span class="ico">❓</span> Practice Quiz</a>
+        <a href="#/exam" data-route="exam"><span class="ico">📝</span> Exam Simulator</a>
+        <a href="#/flashcards" data-route="flashcards"><span class="ico">🃏</span> Flashcards</a>
+        <div class="nav-sep">Play</div>
+        <a href="#/games" data-route="games"><span class="ico">🕹️</span> Arcade</a>
+        <a href="#/terminal" data-route="terminal"><span class="ico">💻</span> Terminal Lab</a>
+        <div class="nav-sep">Learn</div>
+        <a href="#/lab" data-route="lab"><span class="ico">🧪</span> Study Lab</a>
+        <a href="#/reference" data-route="reference"><span class="ico">📚</span> Cheat Sheets</a>
+        <a href="#/progress" data-route="progress"><span class="ico">🏅</span> Progress</a>
+      </nav>
+      <div class="player-card">
+        <div id="player"></div>
+        <button class="btn sm ghost theme-toggle" id="themeBtn">🌓 Toggle theme</button>
+      </div>
+    </aside>
+    <div>
+      <div class="topbar">
+        <button class="btn sm" id="menuBtn" aria-label="Open menu">☰</button>
+        <strong>A+ Quest</strong>
+      </div>
+      <main class="main" id="main"></main>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <script src="data/exams.js"></script>
+  <script src="data/core1-questions.js"></script>
+  <script src="data/core2-questions.js"></script>
+  <script src="data/flashcards.js"></script>
+  <script src="data/teachback.js"></script>
+  <script src="data/games.js"></script>
+  <script src="data/reference.js"></script>
+
+  <!-- Engine -->
+  <script src="js/core.js"></script>
+  <script src="js/views/dashboard.js"></script>
+  <script src="js/views/quiz.js"></script>
+  <script src="js/views/flashcards.js"></script>
+  <script src="js/views/games.js"></script>
+  <script src="js/games/portmatch.js"></script>
+  <script src="js/games/ordering.js"></script>
+  <script src="js/games/sorter.js"></script>
+  <script src="js/games/memory.js"></script>
+  <script src="js/games/blitz.js"></script>
+  <script src="js/terminal/shell.js"></script>
+  <script src="js/terminal/windows.js"></script>
+  <script src="js/terminal/linux.js"></script>
+  <script src="js/terminal/missions.js"></script>
+  <script src="js/views/terminal.js"></script>
+  <script src="js/views/lab.js"></script>
+  <script src="js/views/reference.js"></script>
+  <script src="js/views/progress.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
