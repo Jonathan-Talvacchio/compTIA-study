@@ -115,12 +115,25 @@
   }
   function isLocal(w, ip) { return w.net.ip && ip.split(".").slice(0, 3).join(".") === w.net.ip.split(".").slice(0, 3).join("."); }
   function apipa(w) { return !w.net.ip || w.net.ip.startsWith("169.254."); }
+  // The hosts file is checked before DNS, which is why malware likes to edit it.
+  function hostsLookup(w, name) {
+    if (name.toLowerCase() === "localhost") return "127.0.0.1";
+    const f = w.fs.get(["Windows", "System32", "drivers", "etc", "hosts"]);
+    for (const line of (f ? f.content : "").split(/\r?\n/)) {
+      const parts = line.replace(/#.*/, "").trim().split(/\s+/);
+      if (parts.length > 1 && parts.slice(1).some(n => n.toLowerCase() === name.toLowerCase())) return parts[0];
+    }
+    return null;
+  }
   function resolve(w, name) {
     if (/^\d+\.\d+\.\d+\.\d+$/.test(name)) return name;
+    const local = hostsLookup(w, name);
+    if (local) return local;
     if (apipa(w) || !w.net.dnsWorks) return null;
     return w.dnsTable[name.toLowerCase()] || null;
   }
   function reachable(w, ip) {
+    if (ip.startsWith("127.")) return true;
     if (apipa(w)) return false;
     if (ip === "127.0.0.1" || ip === w.net.ip) return true;
     if (isLocal(w, ip)) return !!w.hosts[ip];
@@ -166,9 +179,10 @@
     tree: "Graphically displays the folder structure of a drive or path.\n\nTREE [drive:][path] [/F]",
     help: "Provides Help information for Windows commands."
   };
+  HELP.notepad = "Opens a text file in Notepad (the simulator shows it in an editor panel).\n\nNOTEPAD [path\\]filename";
   HELP.mkdir = HELP.md; HELP.rd = HELP.rmdir; HELP.chdir = HELP.cd; HELP.erase = HELP.del; HELP.rename = HELP.ren;
 
-  const COMMANDS = ["cd", "chdir", "cls", "copy", "del", "dir", "diskpart", "dism", "echo", "erase", "exit", "format", "gpresult", "gpupdate", "help",
+  const COMMANDS = ["notepad", "cd", "chdir", "cls", "copy", "del", "dir", "diskpart", "dism", "echo", "erase", "exit", "format", "gpresult", "gpupdate", "help",
     "hostname", "ipconfig", "md", "mkdir", "move", "net", "netstat", "nslookup", "pathping", "ping", "rd", "ren", "rename", "rmdir", "robocopy",
     "sfc", "chkdsk", "shutdown", "systeminfo", "taskkill", "tasklist", "tracert", "tree", "type", "ver", "whoami", "winver", "xcopy"];
 
@@ -185,7 +199,7 @@
       ["GPRESULT", "Displays Group Policy information for machine or user."], ["GPUPDATE", "Updates Group Policy settings."],
       ["HOSTNAME", "Prints the name of the current host."], ["IPCONFIG", "Displays and manages IP configuration."],
       ["MD", "Creates a directory."], ["MOVE", "Moves one or more files."], ["NET", "Manages users, groups, shares, services and drive mappings."],
-      ["NETSTAT", "Displays active connections and listening ports."], ["NSLOOKUP", "Queries DNS."], ["PATHPING", "Route + packet loss per hop."],
+      ["NETSTAT", "Displays active connections and listening ports."], ["NOTEPAD", "Opens a text file for editing."], ["NSLOOKUP", "Queries DNS."], ["PATHPING", "Route + packet loss per hop."],
       ["PING", "Tests connectivity with ICMP echo."], ["RD", "Removes a directory."], ["REN", "Renames a file or files."],
       ["ROBOCOPY", "Advanced utility to copy files and directory trees."], ["SFC", "System File Checker."], ["SHUTDOWN", "Shut down or restart the computer."],
       ["SYSTEMINFO", "Displays machine specific properties and configuration."], ["TASKKILL", "Kill or stop a running process or application."],
@@ -637,6 +651,24 @@
       io.out("The command completed successfully.");
       return;
     }
+    if (sub === "view") {
+      if (apipa(w)) { io.out("System error 6118 has occurred.\n\nThe list of servers for this workgroup is not currently available", "t-err"); return; }
+      const target = rest.find(x => x.startsWith("\\\\"));
+      if (!target) {
+        io.out("Server Name            Remark\n\n-------------------------------------------------------------------------------");
+        ["DC01", "FILESERVER", "PRINTER01", w.hostname].forEach(n => io.out(`\\\\${n.padEnd(21)}`));
+        io.out("The command completed successfully.");
+        return;
+      }
+      const host = target.slice(2).toLowerCase();
+      const shares = { fileserver: [["backups", "Disk", "Nightly backups"], ["public", "Disk", "Company-wide files"], ["sales", "Disk", "Sales team"]], dc01: [["NETLOGON", "Disk", "Logon server share"], ["SYSVOL", "Disk", "Logon server share"]], printer01: [["Front-Desk", "Print", "HP LaserJet"]] }[host];
+      if (!shares) { io.out("System error 53 has occurred.\n\nThe network path was not found.", "t-err"); return; }
+      io.out(`Shared resources at ${target}\n\n\n\nShare name  Type  Used as  Comment\n\n-------------------------------------------------------------------------------`);
+      shares.forEach(([n, t, c]) => io.out(`${n.padEnd(12)}${t.padEnd(14)}${c}`));
+      io.out("The command completed successfully.");
+      w.flags.netView = host;
+      return;
+    }
     if (sub === "share") {
       if (!rest.length) {
         io.out("\nShare name   Resource                        Remark\n\n-------------------------------------------------------------------------------");
@@ -796,6 +828,27 @@
     io.out("Loading Processor Information ...");
     await io.sleep(500);
     io.out(`\nHost Name:                 ${w.hostname}\nOS Name:                   Microsoft Windows 11 Pro\nOS Version:                10.0.26100 N/A Build 26100\nOS Manufacturer:           Microsoft Corporation\nOS Configuration:          Member Workstation\nRegistered Owner:          ${w.user}\nSystem Manufacturer:       Dell Inc.\nSystem Model:              OptiPlex 7010\nSystem Type:               x64-based PC\nProcessor(s):              1 Processor(s) Installed.\n                           [01]: Intel64 Family 6 Model 183 ~2100 Mhz\nBIOS Version:              Dell Inc. 1.14.0, UEFI\nTotal Physical Memory:     16,128 MB\nAvailable Physical Memory: ${num(R(5000, 9000))} MB\nDomain:                    corp.local\nLogon Server:              \\\\DC01\nHotfix(s):                 4 Hotfix(s) Installed.\nNetwork Card(s):           1 NIC(s) Installed.\n                           [01]: Intel(R) Ethernet Connection (16) I219-LM\n                                 DHCP Enabled:    Yes\n                                 IP address(es)\n                                 [01]: ${w.net.ip || "(none)"}\nHyper-V Requirements:      VM Monitor Mode Extensions: Yes\n                           Virtualization Enabled In Firmware: Yes`);
+  };
+
+  // --- Notepad (opens the simulator's editor panel) ---
+  C.notepad = async (a, io, w) => {
+    const file = a.join(" ");
+    if (!file) { io.out("(Simulator) Give Notepad a file name, e.g. notepad notes.txt", "t-dim"); return; }
+    const p = parsePath(w, file);
+    const node = p && w.fs.get(p);
+    if (!p || (!node && !w.fs.parentOf(p))) { io.out("The system cannot find the path specified.", "t-err"); return; }
+    if (node && node.type === "dir") { io.out("Access is denied.", "t-err"); return; }
+    const name = p[p.length - 1];
+    await io.edit({
+      kind: "notepad", name, content: node ? node.content.replace(/\r\n/g, "\n") : "",
+      save(text) {
+        const protectedPath = p[0] && p[0].toLowerCase() === "windows";
+        if (protectedPath && !w.admin) return "Access is denied. Open Notepad as administrator to save here.";
+        w.fs.write(p, text.replace(/\n/g, "\r\n"));
+        w.flags.edited = (w.flags.edited || []).concat(p.join("\\").toLowerCase());
+        return null;
+      }
+    });
   };
 
   // --- DiskPart sub-shell ---

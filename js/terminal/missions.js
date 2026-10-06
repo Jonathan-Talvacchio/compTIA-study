@@ -173,9 +173,89 @@
         { text: "Ping an internet IP 4 times (proves routing works)", hint: "ping -c 4 8.8.8.8", check: c => (c.w.flags.ping || []).some(p => /^\d/.test(p.target) && !p.target.startsWith("192.168") && p.ok > 0) },
         { text: "Try curl https://comptia.org (watch the error)", hint: "curl https://comptia.org", check: c => c.cmd === "curl" && c.out.includes("Could not resolve") },
         { text: "Check which DNS server is configured", hint: "cat /etc/resolv.conf", check: c => c.cmd === "cat" && c.lower.includes("resolv.conf") },
-        { text: "Query a public DNS server directly with dig to prove the local one is broken", hint: "dig @8.8.8.8 comptia.org", check: c => (c.w.flags.dig || []).some(d => d.server && d.server !== "192.168.1.10" && d.ok) }
+        { text: "Query a public DNS server directly with dig to prove the local one is broken", hint: "dig @8.8.8.8 comptia.org", check: c => (c.w.flags.dig || []).some(d => d.server && d.server !== "192.168.1.10" && d.ok) },
+        { text: "Fix it: edit /etc/resolv.conf so the nameserver is 8.8.8.8 (needs elevation)", hint: "sudo nano /etc/resolv.conf → change the nameserver line → Ctrl+O to save, Ctrl+X to exit", check: c => /^\s*nameserver\s+(8\.8\.8\.8|8\.8\.4\.4|1\.1\.1\.1|1\.0\.0\.1|9\.9\.9\.9)\s*$/m.test(c.w.fs.get(["etc", "resolv.conf"]).content.split("\n").filter(l => /^\s*nameserver/.test(l))[0] || "") },
+        { text: "Prove the fix: load https://comptia.org with curl", hint: "curl https://comptia.org", check: c => c.cmd === "curl" && c.lower.includes("comptia.org") && c.out.includes("<html") }
       ],
-      debrief: "IP connectivity works (ping 8.8.8.8) but names don't resolve, and dig @8.8.8.8 succeeds — so the configured DNS server (192.168.1.10 in /etc/resolv.conf) is the problem. Bottom-up troubleshooting isolates the layer fast."
+      debrief: "IP connectivity worked (ping 8.8.8.8) but names didn't resolve, and dig @8.8.8.8 succeeded — so the configured DNS server in /etc/resolv.conf was the problem. Pointing it at a working resolver fixed it. On a real server you'd fix it in the network configuration (netplan/NetworkManager) so it survives a reboot."
+    },
+    // ---------------- added missions ----------------
+    {
+      id: "win-hosts", os: "windows", title: "Bank Site Redirects to a Fake", difficulty: "Medium", objective: "Core 2 2.x / 3.4",
+      story: "A user says their bank's website \"looks different\" and asked for their password twice. Other PCs reach the real site. Something on this PC is redirecting www.contosobank.com.",
+      setup(w) {
+        const f = w.fs.get(["Windows", "System32", "drivers", "etc", "hosts"]);
+        f.content += "\r\n203.0.113.66    www.contosobank.com";
+        w.dnsTable["www.contosobank.com"] = "198.51.100.20";
+        w.dnsTable["contosobank.com"] = "198.51.100.20";
+      },
+      objectives: [
+        { text: "Ping www.contosobank.com and note the IP address it resolves to", hint: "ping www.contosobank.com", check: c => c.cmd === "ping" && c.lower.includes("contosobank") && c.out.includes("203.0.113.66") },
+        { text: "Ask DNS directly for the same name — do the addresses match?", hint: "nslookup www.contosobank.com", check: c => c.cmd === "nslookup" && c.out.includes("198.51.100.20") },
+        { text: "DNS is fine, so check the local hosts file", hint: "type C:\\Windows\\System32\\drivers\\etc\\hosts", check: c => c.cmd === "type" && c.out.includes("contosobank") },
+        { text: "Open the hosts file in Notepad, delete the bad line and save", hint: "notepad C:\\Windows\\System32\\drivers\\etc\\hosts → delete the contosobank line → Ctrl+S → Close", check: c => !c.w.fs.get(["Windows", "System32", "drivers", "etc", "hosts"]).content.toLowerCase().includes("contosobank") },
+        { text: "Flush the DNS resolver cache", hint: "ipconfig /flushdns", check: c => c.cmd === "ipconfig" && c.lower.includes("/flushdns") },
+        { text: "Confirm the name now resolves to the real address", hint: "ping www.contosobank.com", check: c => c.cmd === "ping" && c.lower.includes("contosobank") && c.out.includes("198.51.100.20") }
+      ],
+      debrief: "Windows checks the hosts file before asking DNS, so malware adds lines to it to send users to look-alike sites. ping uses the hosts file but nslookup asks the DNS server directly — when they disagree, suspect the hosts file. After cleaning it, follow the full malware removal process (scan, update, educate the user) and have the user change their bank password."
+    },
+    {
+      id: "win-backup", os: "windows", title: "Back Up Before Reimaging", difficulty: "Easy", objective: "Core 2 1.5 / 4.3",
+      story: "This PC is about to be reimaged. Before wiping it, back up the user's Documents folder — including every subfolder — to C:\\Backup\\student.",
+      setup(w) {
+        const docs = w.fs.get(["Users", "student", "Documents"]);
+        docs.children["Q3 report.docx"] = { type: "file", name: "Q3 report.docx", content: "[binary document data]", mode: "rw-r--r--", owner: "student" };
+        w.fs.mkdir(["Users", "student", "Documents", "Projects", "Website"]);
+        w.fs.write(["Users", "student", "Documents", "Projects", "Website", "index.html"], "<h1>Draft site</h1>");
+      },
+      objectives: [
+        { text: "Look at what's in the Documents folder", hint: "dir Documents", check: c => c.cmd === "dir" && (c.lower.includes("documents") || c.w.cwd.join("\\").toLowerCase().endsWith("documents")) },
+        { text: "Create the backup folder C:\\Backup\\student", hint: "md C:\\Backup\\student", check: c => !!c.w.fs.get(["Backup", "student"]) },
+        { text: "Copy Documents and ALL subfolders with robocopy", hint: "robocopy Documents C:\\Backup\\student\\Documents /E", check: c => { let ok = false; const b = c.w.fs.get(["Backup", "student"]); if (b) c.w.fs.walk(b, [], n => { if (n.name === "index.html") ok = true; }); return ok; } },
+        { text: "Verify the copy with dir", hint: "dir C:\\Backup\\student\\Documents", check: c => c.cmd === "dir" && c.lower.includes("backup") },
+        { text: "Show the whole backup as a tree, including files", hint: "tree C:\\Backup\\student /F", check: c => c.cmd === "tree" && c.lower.includes("/f") }
+      ],
+      debrief: "robocopy (Robust File Copy) is the exam's go-to for copying folder trees: /E copies all subfolders (even empty ones), /MIR mirrors a folder (and deletes extras at the destination), and /Z makes copies restartable. Always verify a backup before you wipe anything — an untested backup isn't a backup."
+    },
+    {
+      id: "lx-usb", os: "linux", title: "Field Team's USB Drive", difficulty: "Medium", objective: "Core 2 1.9",
+      story: "The survey team plugged in a USB drive with this week's data, but it was yanked out of a laptop without being ejected. Get the data accessible at /mnt/data.",
+      setup(w) {
+        w.fs.mkdir(["mnt"]);
+        const m = w.fs.get(["mnt"]); m.owner = m.group = "root";
+        w.blockDevices.push({ name: "sdb", size: "59.8G", rm: 1, parts: [{ name: "sdb1", size: "59.8G", fs: "ext4", label: "FIELDDATA", mount: null, dirty: true, used: "12G", avail: "45G", pct: "21%",
+          files: { "survey-2026.csv": "site,reading\nA,42\nB,37\nC,51", "README.txt": "Field data from the survey team.", photos: { "site-a.jpg": "[jpeg data]" } } }] });
+      },
+      objectives: [
+        { text: "List the block devices to find the USB drive", hint: "lsblk", check: c => c.w.flags.lsblk },
+        { text: "Create the mount point /mnt/data", hint: "sudo mkdir -p /mnt/data", check: c => !!c.w.fs.get(["mnt", "data"]) },
+        { text: "Try to mount /dev/sdb1 on /mnt/data", hint: "sudo mount /dev/sdb1 /mnt/data", check: c => c.w.flags.mountFailed || (c.w.flags.mounted || []).includes("/mnt/data") },
+        { text: "The file system is damaged. Check and repair it (it must not be mounted)", hint: "sudo fsck -y /dev/sdb1", check: c => c.w.flags.fsck === "/dev/sdb1" },
+        { text: "Mount it again", hint: "sudo mount /dev/sdb1 /mnt/data", check: c => (c.w.flags.mounted || []).includes("/mnt/data") },
+        { text: "List the files on the drive", hint: "ls /mnt/data", check: c => c.cmd === "ls" && c.out.includes("survey-2026.csv") },
+        { text: "Confirm it shows up in the disk usage report", hint: "df -h", check: c => c.cmd === "df" && c.out.includes("/mnt/data") }
+      ],
+      debrief: "lsblk lists disks and partitions. A drive pulled out without unmounting can be left with file system errors, so mount refuses it. fsck checks and repairs a file system — always on an unmounted partition. mount attaches a partition to a directory (umount detaches it), and entries in /etc/fstab make mounts permanent."
+    },
+    {
+      id: "lx-web", os: "linux", title: "The Website Is Down", difficulty: "Easy", objective: "Core 2 1.9 / 3.x",
+      story: "The company intranet runs on this server's nginx web service, and users report the page won't load. Find out what's wrong and bring it back — and make sure it survives a reboot.",
+      setup(w) {
+        w.services.nginx = "failed";
+        w.processes = w.processes.filter(p => !p.cmd.startsWith("nginx"));
+        w.fs.get(["var", "log"]).children.nginx = { type: "dir", name: "nginx", mode: "rwxr-xr-x", owner: "root", group: "root", children: {
+          "error.log": { type: "file", name: "error.log", mode: "rw-r--r--", owner: "root", group: "root",
+            content: "2026/10/06 08:59:12 [notice] 1422#1422: signal process started\n2026/10/06 09:41:03 [alert] 1422#1422: worker process 1430 exited on signal 9\n2026/10/06 09:41:03 [alert] 1422#1422: worker process 1431 exited on signal 9\n2026/10/06 09:41:04 [emerg] 1422#1422: master process exiting after out-of-memory kill" } } };
+      },
+      objectives: [
+        { text: "Confirm the site is down from the server itself", hint: "curl http://localhost", check: c => c.w.flags.curlLocalFail },
+        { text: "Check the status of the nginx service", hint: "systemctl status nginx", check: c => c.cmd === "systemctl" && c.lower.includes("status") && c.lower.includes("nginx") },
+        { text: "Read the last lines of the nginx error log", hint: "tail /var/log/nginx/error.log", check: c => (c.cmd === "tail" || c.cmd === "cat") && c.out.includes("exited on signal 9") },
+        { text: "Restart the service (needs elevation)", hint: "sudo systemctl restart nginx", check: c => c.w.services.nginx === "active" },
+        { text: "Make sure nginx starts automatically at boot", hint: "sudo systemctl enable nginx", check: c => c.w.flags["svc-enable"] === "nginx" },
+        { text: "Verify the page loads again", hint: "curl http://localhost", check: c => c.w.flags.curlLocalOk }
+      ],
+      debrief: "systemctl manages services: status shows whether a service is running and why it stopped, restart brings it back, and enable makes it start at boot. Logs under /var/log explain the cause — here the kernel killed nginx for using too much memory, so the next step would be finding out why memory ran out."
     }
   ];
   App.missionCount = () => App.missions.length;

@@ -274,6 +274,33 @@ textarea { width: 100%; min-height: 160px; resize: vertical; }
 .t-exe { color: #8ae234; font-weight: 700; }
 .t-prompt-l { color: #8ae234; font-weight: 700; }
 .t-prompt-p { color: #729fcf; font-weight: 700; }
+.editor { flex: 1; min-height: 0; display: flex; flex-direction: column; font-family: var(--mono); }
+.editor .ed-head { padding: 4px 12px; background: #eeeeec; color: #300a24; font-weight: 700; white-space: pre; }
+.editor .ed-text { flex: 1; min-height: 0; resize: none; border: 0; border-radius: 0; outline: none; background: transparent; color: inherit; font: inherit; padding: 8px 12px; line-height: 1.45; }
+.editor .ed-status { min-height: 1.5em; padding: 0 12px; text-align: center; color: #fbbf24; }
+.editor .ed-status.ask { background: #eeeeec; color: #300a24; font-weight: 700; text-align: left; }
+.editor .ed-foot { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 12px 10px; }
+.editor .ed-key { font: inherit; font-size: 12px; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: inherit; border-radius: 6px; padding: 3px 8px; cursor: pointer; }
+.editor.notepad { background: #ffffff; color: #111111; font-family: Consolas, var(--mono); }
+.editor.notepad .ed-head { background: #f3f3f3; color: #111; font-family: var(--sans); font-weight: 600; border-bottom: 1px solid #ddd; }
+.editor.notepad .ed-status { color: #555; text-align: left; }
+.editor.notepad .ed-key { border-color: #ccc; background: #f3f3f3; color: #111; font-family: var(--sans); }
+.term-side { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.guide summary { cursor: pointer; font-weight: 800; }
+.guide-list { display: grid; gap: 8px; margin-top: 10px; max-height: 420px; overflow-y: auto; padding-right: 4px; }
+.guide-item { font-size: .85rem; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.guide-ex { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.guide-ex .ex { font-family: var(--mono); font-size: .76rem; padding: 2px 7px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-2); color: var(--accent-2); cursor: pointer; text-align: left; }
+.guide-ex .ex:hover { border-color: var(--accent-2); }
+.lesson-steps { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 8px; }
+.lesson-steps li { padding: 10px 12px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--border); font-size: .9rem; }
+.lesson-steps li.done { border-color: var(--good); }
+.lesson-steps li.done .txt { color: var(--muted); }
+.lesson-steps li.current { border-color: var(--accent-2); box-shadow: 0 0 0 1px var(--accent-2); }
+.lesson-teach { margin-bottom: 8px; }
+.lesson-task { font-weight: 700; margin-bottom: 6px; }
+.lesson-after { margin-top: 6px; font-size: .82rem; color: var(--muted); border-left: 3px solid var(--good); padding-left: 8px; }
+.drill-q { font-size: 1.15rem; font-weight: 700; margin: 14px 0 8px; }
 .objectives { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .objectives li { display: flex; gap: 8px; font-size: .9rem; padding: 8px 10px; background: var(--panel-2); border-radius: 10px; border: 1px solid var(--border); }
 .objectives li.done { border-color: var(--good); }

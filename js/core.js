@@ -56,6 +56,7 @@ window.App = (function () {
     bests: {},
     examHistory: [],
     missionsDone: {},
+    lessonsDone: {},
     examFilter: "both",
     theme: "dark"
   });
@@ -98,6 +99,7 @@ window.App = (function () {
     if (!box) { box = h("div", { class: "toasts" }); document.body.appendChild(box); }
     const t = h("div", { class: `toast ${kind}` }, msg);
     box.appendChild(t);
+    while (box.children.length > 3) box.firstChild.remove();
     setTimeout(() => t.remove(), 3200);
   };
   App.confetti = function (n = 80) {
@@ -247,6 +249,9 @@ window.App = (function () {
     { id: "port-master", ico: "🔌", name: "Port Master", desc: "Port Match in under 45s", test: s => s.bests.portmatch != null && s.bests.portmatch <= 45 },
     { id: "blitz", ico: "⚡", name: "Lightning Brain", desc: "Score 20+ in Tech Blitz", test: s => (s.bests.blitz || 0) >= 20 },
     { id: "shell", ico: "💻", name: "Shell Shocked", desc: "Complete a terminal mission", test: s => s.counters.missions >= 1 },
+    { id: "cli-student", ico: "🎒", name: "CLI Student", desc: "Finish a Terminal Academy lesson", test: s => Object.keys(s.lessonsDone || {}).length >= 1 },
+    { id: "academy", ico: "🎓", name: "Academy Graduate", desc: "Finish every Terminal Academy lesson", test: s => Object.keys(s.lessonsDone || {}).length >= ((App.lessons && App.lessons.length) || 999) },
+    { id: "drill-ace", ico: "⌨️", name: "Command Line Ace", desc: "Score 9+ in a Command Drill round", test: s => Math.max(s.bests["drill-windows"] || 0, s.bests["drill-linux"] || 0) >= 9 },
     { id: "sysadmin", ico: "🧙", name: "Sysadmin", desc: "Complete every terminal mission", test: s => Object.keys(s.missionsDone).length >= ((App.missionCount && App.missionCount()) || 999) },
     { id: "exam-taker", ico: "📝", name: "Test Pilot", desc: "Finish a full exam simulation", test: s => s.counters.exams >= 1 },
     { id: "exam-pass", ico: "🏆", name: "Passing Grade", desc: "Pass an exam simulation", test: s => s.examHistory.some(e => e.pass) },
