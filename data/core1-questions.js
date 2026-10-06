@@ -182,10 +182,10 @@ DATA.core1Questions = [
   {
     id: "c1-023",
     domain: "2",
-    q: "A network monitoring server must receive unsolicited alert messages (traps) sent by switches and routers. Which port must be open on the monitoring server?",
-    choices: ["UDP 162", "UDP 161", "TCP 389", "TCP 445"],
-    answer: [0],
-    explanation: "SNMP traps are sent to the manager on UDP 162. UDP 161 is used by agents to answer polling requests from the manager."
+    q: "An application must query Active Directory over an encrypted connection using LDAP over SSL/TLS. Which port must be allowed through the firewall?",
+    choices: ["TCP 389", "TCP 636", "TCP 443", "TCP 3389"],
+    answer: [1],
+    explanation: "LDAPS (LDAP over SSL/TLS) uses TCP 636. Unencrypted LDAP uses 389, 443 is HTTPS, and 3389 is RDP."
   },
   {
     id: "c1-024",
@@ -198,10 +198,10 @@ DATA.core1Questions = [
   {
     id: "c1-025",
     domain: "2",
-    q: "A warehouse has older handheld scanners that support only the 2.4 GHz band. Which wireless standards operate exclusively in the 2.4 GHz band? (Choose two.)",
-    choices: ["802.11a", "802.11b", "802.11ac", "802.11g", "802.11ax"],
-    answer: [1, 3],
-    explanation: "802.11b and 802.11g operate only at 2.4 GHz. 802.11a and 802.11ac are 5 GHz only, and 802.11ax supports 2.4 GHz and 5 GHz (plus 6 GHz with Wi-Fi 6E)."
+    q: "A warehouse has older handheld scanners that support only the 2.4 GHz band. Which statements about the 2.4 GHz band are correct? (Choose two.)",
+    choices: ["It generally has longer range and better wall penetration than 5 GHz", "It offers more non-overlapping channels than 5 GHz", "In North America, channels 1, 6, and 11 do not overlap", "It is used only by Wi-Fi 6E and Wi-Fi 7 devices", "It is immune to interference from microwave ovens"],
+    answer: [0, 2],
+    explanation: "Lower frequencies travel farther and pass through walls better, and 2.4 GHz has only three non-overlapping channels (1, 6, 11) in North America. 5 GHz has many more channels, and microwave ovens commonly interfere with 2.4 GHz."
   },
   {
     id: "c1-026",
@@ -732,50 +732,50 @@ DATA.core1Questions = [
   {
     id: "c1-091",
     domain: "5",
-    q: "A user reports that a workstation cannot print to a network printer. According to the CompTIA troubleshooting methodology, what should the technician do first?",
-    choices: ["Establish a theory of probable cause", "Identify the problem by gathering information and questioning the user", "Test the theory to determine the cause", "Establish a plan of action and implement the solution"],
-    answer: [1],
-    explanation: "Step 1 is to identify the problem: gather information, question the user, and identify recent changes. A theory of probable cause comes only after the problem is understood."
+    q: "A laptop display flickers, and the flickering changes when the user opens or closes the lid. What is the most likely cause?",
+    choices: ["A loose or damaged display cable running through the hinge", "An outdated chipset driver", "A failing CMOS battery", "Incorrect DNS settings"],
+    answer: [0],
+    explanation: "Symptoms that change as the lid moves point to the video cable that runs through the hinge. A driver problem would not change with the lid's position."
   },
   {
     id: "c1-092",
     domain: "5",
-    q: "A technician has established a theory of probable cause for a slow workstation. According to the troubleshooting methodology, what is the next step?",
-    choices: ["Document findings, actions, outcomes, and lessons learned", "Verify full system functionality", "Establish a plan of action to resolve the problem", "Test the theory to determine the cause"],
-    answer: [3],
-    explanation: "Step 3, testing the theory to determine the cause, follows step 2. Planning a fix before confirming the cause risks solving the wrong problem."
+    q: "Users report that Wi-Fi works near the access point but keeps dropping in offices at the far end of the floor. A Wi-Fi analyzer shows a signal of about -80 dBm in those offices. What is the BEST fix?",
+    choices: ["Add or reposition an access point to improve coverage", "Change the SSID", "Switch from WPA3 to WPA2", "Disable DHCP on the router"],
+    answer: [0],
+    explanation: "A -80 dBm signal is too weak for a reliable connection, so the fix is better coverage from an added or moved access point. Changing the SSID or security type does not strengthen the signal."
   },
   {
     id: "c1-093",
     domain: "5",
-    q: "A technician tests a theory and confirms the cause of a problem. Which step of the troubleshooting methodology comes next?",
-    choices: ["Establish a plan of action to resolve the problem and implement the solution", "Document findings, actions, outcomes, and lessons learned", "Establish a new theory of probable cause", "Identify the problem"],
+    q: "A workstation with a static IP address can reach file servers on its own subnet but cannot reach other subnets or the internet. Other PCs on the subnet work normally. What should the technician check first?",
+    choices: ["The default gateway setting", "The monitor cable", "The printer driver", "The BIOS password"],
     answer: [0],
-    explanation: "After the cause is confirmed, step 4 is to establish a plan of action and implement the solution. A new theory is needed only if the first theory was not confirmed."
+    explanation: "Traffic to other networks goes through the default gateway, so a missing or wrong gateway allows local access only. The other items do not affect routing."
   },
   {
     id: "c1-094",
     domain: "5",
-    q: "After replacing a failed power supply, a technician confirms that the computer boots and works normally and recommends a UPS to protect against future power problems. Which troubleshooting step is the technician performing?",
-    choices: ["Document findings, actions, outcomes, and lessons learned", "Establish a plan of action", "Verify full system functionality and, if applicable, implement preventive measures", "Test the theory to determine the cause"],
-    answer: [2],
-    explanation: "Step 5 confirms that the whole system works and adds preventive measures such as a UPS. Documentation is step 6, which comes afterward."
+    q: "An external monitor shows 'No signal' when connected to a laptop with a USB-C cable, but the same monitor and cable work with another laptop. What should the technician check?",
+    choices: ["Whether the laptop's USB-C port supports video output (DisplayPort Alt Mode or Thunderbolt)", "The monitor's power cable", "The laptop's Wi-Fi driver", "The monitor's refresh rate setting"],
+    answer: [0],
+    explanation: "Not every USB-C port carries video; it needs DisplayPort Alt Mode or Thunderbolt support. The monitor and cable are already proven good on another laptop."
   },
   {
     id: "c1-095",
     domain: "5",
-    q: "What is the final step of the CompTIA troubleshooting methodology?",
-    choices: ["Verify full system functionality", "Document findings, actions, outcomes, and lessons learned", "Establish a plan of action", "Implement preventive measures"],
-    answer: [1],
-    explanation: "Step 6, the last step, is documenting findings, actions, outcomes, and lessons learned. Verifying functionality and implementing preventive measures are both part of step 5."
+    q: "Every page from a laser printer has a thin vertical black line in exactly the same position. Which component is the most likely cause?",
+    choices: ["A scratched or dirty imaging drum", "The pickup roller", "The printer's network card", "The duplexing assembly"],
+    answer: [0],
+    explanation: "A defect on the imaging drum repeats in the same place on every page. A worn pickup roller causes misfeeds and jams, not print marks."
   },
   {
     id: "c1-096",
     domain: "5",
-    q: "A technician is performing the 'identify the problem' step of the troubleshooting methodology. Which actions belong in this step? (Choose two.)",
-    choices: ["Document lessons learned", "Question the user and identify any recent changes", "Implement the solution", "Escalate to the vendor", "Perform backups before making changes"],
-    answer: [1, 4],
-    explanation: "Identifying the problem includes gathering information from the user, identifying user and environmental changes, and performing backups before making changes. Documenting lessons learned is the final step."
+    q: "A desktop reboots randomly, and the technician suspects the power supply. Which tools can be used to test the PSU? (Choose two.)",
+    choices: ["Power supply tester", "Multimeter", "Loopback plug", "Toner probe", "Crimper"],
+    answer: [0, 1],
+    explanation: "A PSU tester and a multimeter both check whether the power supply's voltages are within specification. Loopback plugs, toner probes and crimpers are network tools."
   },
   {
     id: "c1-097",
@@ -968,5 +968,69 @@ DATA.core1Questions = [
     choices: ["Reboot the core router", "Change the Wi-Fi channel", "Test the patch cable with a cable tester and replace it", "Renew the DHCP lease"],
     answer: [2],
     explanation: "Packet loss limited to one host with a visibly damaged cable points to the cable, which a cable tester can confirm. Rebooting the core router would not fix a problem that affects only one workstation."
+  },
+  {
+    id: "c1-121",
+    domain: "1",
+    q: "A traveler wants to add a second cellular plan to a smartphone that has no physical SIM card tray. Which technology makes this possible?",
+    choices: ["eSIM", "NFC", "Bluetooth tethering", "Mobile device management (MDM)"],
+    answer: [0],
+    explanation: "An eSIM is an embedded SIM that is provisioned digitally, so a plan can be added without inserting a card. NFC and Bluetooth are short-range radios, not cellular subscriptions."
+  },
+  {
+    id: "c1-122",
+    domain: "1",
+    q: "A company wants work apps and data on employee-owned phones kept separate from personal apps, so IT can remove only corporate data when someone leaves. Which MDM capability supports this?",
+    choices: ["A work profile or container with selective wipe", "A full-device remote wipe", "Disabling Bluetooth", "Carrier unlocking"],
+    answer: [0],
+    explanation: "A work profile (containerization) separates corporate apps and data, which allows a selective wipe on BYOD devices. A full remote wipe would erase the employee's personal data too."
+  },
+  {
+    id: "c1-123",
+    domain: "2",
+    q: "An administrator creates a DHCP scope of 192.168.1.10 to 192.168.1.200 but must stop the server from handing out .50 through .60, which are statically assigned to printers. What should be configured?",
+    choices: ["A DHCP exclusion range", "A DHCP reservation", "A shorter lease time", "A second VLAN"],
+    answer: [0],
+    explanation: "An exclusion range keeps addresses inside the scope from being leased. A reservation does the opposite: it always gives one specific address to a specific MAC address."
+  },
+  {
+    id: "c1-124",
+    domain: "2",
+    q: "Which network service stores structured application data and answers queries from applications, often using SQL?",
+    choices: ["Database server", "Syslog server", "Proxy server", "Spam gateway"],
+    answer: [0],
+    explanation: "A database server stores and retrieves structured data for applications. Syslog collects log messages, a proxy forwards web requests, and a spam gateway filters email."
+  },
+  {
+    id: "c1-125",
+    domain: "2",
+    q: "Which statement about the 6 GHz Wi-Fi band is correct?",
+    choices: ["It requires Wi-Fi 6E or Wi-Fi 7 devices and offers many wide, uncongested channels, with shorter range than 2.4 GHz", "All 802.11ac (Wi-Fi 5) devices can use it", "It has longer range than the 2.4 GHz band", "It is the band Bluetooth uses"],
+    answer: [0],
+    explanation: "6 GHz was added with Wi-Fi 6E and is also used by Wi-Fi 7. Its higher frequency means shorter range, and Bluetooth uses 2.4 GHz."
+  },
+  {
+    id: "c1-126",
+    domain: "3",
+    q: "A buyer wants an LCD monitor with deeper blacks and finer local dimming than a standard edge-lit LCD, without OLED's risk of burn-in. Which backlight technology fits best?",
+    choices: ["Mini LED", "CCFL", "Plasma", "E-ink"],
+    answer: [0],
+    explanation: "Mini LED backlights use thousands of tiny LEDs in many dimming zones, improving contrast on an LCD panel. CCFL is an older, dimmer backlight with no local dimming."
+  },
+  {
+    id: "c1-127",
+    domain: "3",
+    q: "A technician needs a motherboard smaller than ATX that still provides up to four expansion slots and fits in most ATX cases. Which form factor should be chosen?",
+    choices: ["microATX", "Mini-ITX", "E-ATX", "Nano-ITX"],
+    answer: [0],
+    explanation: "microATX (244 mm x 244 mm) supports up to four expansion slots and uses mounting holes compatible with ATX cases. Mini-ITX boards have only one expansion slot."
+  },
+  {
+    id: "c1-128",
+    domain: "3",
+    q: "Which statement about USB-C is correct?",
+    choices: ["USB-C is a connector type; whether a port supports fast data, video or power delivery depends on the port and cable", "Every USB-C port supports Thunderbolt", "USB-C carries data only and cannot carry video", "All USB-C cables support the same speeds"],
+    answer: [0],
+    explanation: "USB-C describes the reversible connector, not the capabilities. Video (DisplayPort Alt Mode), Thunderbolt, data speed and power delivery all vary by port and cable."
   }
 ];

@@ -12,8 +12,8 @@ DATA.ports = [
   { port: "110", proto: "POP3", transport: "TCP", desc: "Post Office Protocol v3 — downloads mail from server." },
   { port: "137-139", proto: "NetBIOS/NetBT", transport: "TCP/UDP", desc: "NetBIOS over TCP/IP — legacy Windows name & session services." },
   { port: "143", proto: "IMAP", transport: "TCP", desc: "Internet Message Access Protocol — syncs mail, stays on server." },
-  { port: "161/162", proto: "SNMP", transport: "UDP", desc: "Simple Network Management Protocol — 161 queries, 162 traps." },
   { port: "389", proto: "LDAP", transport: "TCP/UDP", desc: "Lightweight Directory Access Protocol — directory queries (e.g., AD)." },
+  { port: "636", proto: "LDAPS", transport: "TCP", desc: "LDAP over SSL/TLS — encrypted directory queries." },
   { port: "443", proto: "HTTPS", transport: "TCP", desc: "HTTP Secure — web over TLS." },
   { port: "445", proto: "SMB/CIFS", transport: "TCP", desc: "Server Message Block — Windows file & printer sharing." },
   { port: "3389", proto: "RDP", transport: "TCP/UDP", desc: "Remote Desktop Protocol — graphical remote access to Windows." }
@@ -23,7 +23,7 @@ DATA.ports = [
 DATA.orderPuzzles = [
   {
     id: "tshoot", exam: "core1", domain: "5", title: "Troubleshooting Methodology",
-    blurb: "CompTIA's six-step troubleshooting process. Expect at least one question on it on BOTH exams.",
+    blurb: "CompTIA's troubleshooting best practice. In V15 it's supporting material rather than a formal exam objective, but it's how techs work every day.",
     steps: [
       "Identify the problem",
       "Establish a theory of probable cause (question the obvious)",
@@ -34,7 +34,7 @@ DATA.orderPuzzles = [
     ]
   },
   {
-    id: "malware", exam: "core2", domain: "3", title: "Malware Removal Process",
+    id: "malware", exam: "core2", domain: "2", title: "Malware Removal Process",
     blurb: "The seven best-practice steps for malware removal.",
     steps: [
       "Investigate and verify malware symptoms",
@@ -104,7 +104,7 @@ DATA.sortPuzzles = [
     id: "wifi", exam: "core1", domain: "2", title: "Wi-Fi Standards → Frequency",
     buckets: ["2.4 GHz only", "5 GHz only", "2.4 & 5 GHz", "2.4, 5 & 6 GHz"],
     items: [
-      ["802.11b", 0], ["802.11g", 0], ["802.11a", 1], ["802.11ac (Wi-Fi 5)", 1],
+      ["Bluetooth", 0], ["Channels 1, 6 and 11 don't overlap", 0], ["802.11ac (Wi-Fi 5)", 1],
       ["802.11n (Wi-Fi 4)", 2], ["802.11ax (Wi-Fi 6)", 2], ["Wi-Fi 6E", 3], ["802.11be (Wi-Fi 7)", 3]
     ]
   },
@@ -238,7 +238,7 @@ DATA.acronyms = [
   ["PCI DSS", "Payment Card Industry Data Security Standard"], ["GDPR", "General Data Protection Regulation"],
   ["AUP", "Acceptable Use Policy"], ["SOP", "Standard Operating Procedure"], ["EULA", "End-User License Agreement"],
   ["DRM", "Digital Rights Management"], ["SDS", "Safety Data Sheet"], ["ESD", "Electrostatic Discharge"],
-  ["UPS", "Uninterruptible Power Supply"], ["RMM", "Remote Monitoring and Management"], ["MSRA", "Microsoft Remote Assistance"],
+  ["UPS", "Uninterruptible Power Supply"], ["RMM", "Remote Monitoring and Management"], ["SPICE", "Simple Protocol for Independent Computing Environments"],
   ["VNC", "Virtual Network Computing"], ["PXE", "Preboot Execution Environment"], ["GPT", "GUID Partition Table"],
   ["MBR", "Master Boot Record"], ["BYOD", "Bring Your Own Device"], ["XSS", "Cross-Site Scripting"],
   ["BEC", "Business Email Compromise"], ["DDoS", "Distributed Denial of Service"], ["EOL", "End of Life"],
@@ -248,7 +248,7 @@ DATA.acronyms = [
 // ---------- Rapid-fire true/false ("Tech Blitz") ----------
 DATA.truefalse = [
   ["APIPA addresses fall in the 169.254.0.0/16 range.", true],
-  ["802.11g operates on the 5 GHz band.", false],
+  ["The 6 GHz band can be used only by Wi-Fi 6E and Wi-Fi 7 devices.", true],
   ["RAID 5 requires a minimum of three drives.", true],
   ["RAID 0 provides fault tolerance.", false],
   ["SMTP is used to retrieve email from a server to a client.", false],
@@ -257,7 +257,7 @@ DATA.truefalse = [
   ["A Type 2 hypervisor runs directly on bare-metal hardware.", false],
   ["DDR5 modules can be installed in DDR4 slots.", false],
   ["Plenum-rated cable is designed for air-handling spaces because it produces less toxic smoke.", true],
-  ["SNMP traps use UDP port 162.", true],
+  ["LDAPS (secure LDAP) uses TCP port 636.", true],
   ["RDP uses port 3389.", true],
   ["An MX record identifies a domain's mail server.", true],
   ["A CNAME record maps a hostname to an IPv6 address.", false],

@@ -47,4 +47,14 @@ js/terminal/          shell engine + virtual FS (shell.js), windows.js, linux.js
 - **Games:** add entries to `DATA.orderPuzzles`, `DATA.sortPuzzles`, `DATA.truefalse` or `DATA.acronyms` in `data/games.js`.
 - **Terminal missions:** add to `App.missions` in `js/terminal/missions.js`. Each mission has a `setup(world)` function and objectives whose `check(ctx)` runs after every command.
 
+## Sources and verification
+
+The questions, flashcards and cheat sheets are original practice material written against the published 220-1201 and 220-1202 (V15) objectives. In October 2026 the content was cross-checked against:
+
+- [CompTIA](https://www.comptia.org/): the official exam objectives PDFs, which are the authority if anything here disagrees
+- [Professor Messer's 220-1201 course](https://www.professormesser.com/free-a-plus-training/220-1201/220-1201-video/220-1201-training-course/) and [220-1202 course](https://www.professormesser.com/free-a-plus-training/220-1202/220-1202-video/220-1202-training-course/)
+- Professor Messer's articles on what changed: [220-1101 → 220-1201](https://www.professormesser.com/free-a-plus-training/a-plus-articles/differences-between-220-1101-and-220-1201/) and [220-1102 → 220-1202](https://www.professormesser.com/free-a-plus-training/a-plus-articles/differences-between-220-1102-and-220-1202/)
+
+That review led to these changes: SNMP removed from the Core 1 port list and LDAPS (636) added; Wi-Fi content shifted from 802.11a/b/g to the 2.4/5/6 GHz bands; the troubleshooting methodology labeled as a best practice rather than a formal V15 objective; Core 2's removed `xcopy`/`copy`/`shutdown` and MSRA content replaced; malware removal moved to Security (2.6); and new questions added for eSIM, DHCP exclusions, database servers, the 6 GHz band, Mini LED, microATX, USB-C video, zero trust, passwordless authentication, secure DNS, zero-touch and multiboot deployment, Rapid Security Response, `fsck`/`mount`, SPICE and identity synchronization.
+
 > Content is original practice material written against the published 220-1201/220-1202 objectives. It isn't affiliated with or endorsed by CompTIA, and the scaled score is an estimate.
