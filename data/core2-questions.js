@@ -711,7 +711,7 @@ DATA.core2Questions = [
   },
   {
     id: "c2-089",
-    domain: "3",
+    domain: "2",
     q: "A user reports frequent pop-ups and several files that have been renamed. Following the CompTIA malware removal process, what should the technician do FIRST?",
     choices: ["Quarantine the infected system", "Disable System Restore in Windows Home", "Investigate and verify malware symptoms", "Remediate the infected system"],
     answer: [2],
@@ -719,7 +719,7 @@ DATA.core2Questions = [
   },
   {
     id: "c2-090",
-    domain: "3",
+    domain: "2",
     q: "A technician has verified malware symptoms on a Windows Home PC and quarantined it from the network. According to the CompTIA malware removal process, what is the NEXT step?",
     choices: ["Educate the end user", "Disable System Restore in Windows Home", "Schedule scans and run updates", "Enable System Restore and create a restore point in Windows Home"],
     answer: [1],
@@ -727,7 +727,7 @@ DATA.core2Questions = [
   },
   {
     id: "c2-091",
-    domain: "3",
+    domain: "2",
     q: "Why does the CompTIA malware removal process include disabling System Restore before remediating a Windows Home PC?",
     choices: ["Malware can be stored in restore points and could be reintroduced if a restore point is used later", "System Restore must be off for anti-malware software to update", "Disabling System Restore is required to boot into Safe Mode", "System Restore blocks the PC from being quarantined"],
     answer: [0],
@@ -735,7 +735,7 @@ DATA.core2Questions = [
   },
   {
     id: "c2-092",
-    domain: "3",
+    domain: "2",
     q: "Which tasks are part of the 'Remediate infected systems' step of the CompTIA malware removal process? (Choose two.)",
     choices: ["Update anti-malware software", "Educate the end user", "Use scanning and removal techniques, such as Safe Mode or preinstallation environment scans", "Quarantine the infected system", "Enable System Restore and create a restore point"],
     answer: [0, 2],
@@ -743,7 +743,7 @@ DATA.core2Questions = [
   },
   {
     id: "c2-093",
-    domain: "3",
+    domain: "2",
     q: "A technician has removed malware, scheduled scans, run updates, and re-enabled System Restore with a new restore point. Which step of the malware removal process remains?",
     choices: ["Quarantine the infected system", "Investigate and verify malware symptoms", "Disable System Restore in Windows Home", "Educate the end user"],
     answer: [3],
@@ -947,9 +947,9 @@ DATA.core2Questions = [
     id: "c2-118",
     domain: "4",
     q: "A managed service provider supports hundreds of client endpoints. It needs one platform to monitor device health, deploy patches automatically, receive alerts, and remotely access devices. Which type of tool should it use?",
-    choices: ["Remote monitoring and management (RMM)", "Microsoft Remote Assistance (MSRA)", "VNC", "VPN"],
+    choices: ["Remote monitoring and management (RMM)", "SPICE", "VNC", "VPN"],
     answer: [0],
-    explanation: "RMM platforms combine monitoring, alerting, patching, and remote access across many endpoints. MSRA offers one-to-one remote help sessions but no monitoring or patch management."
+    explanation: "RMM platforms combine monitoring, alerting, patching, and remote access across many endpoints. SPICE and VNC only provide remote desktop viewing and control, with no monitoring or patch management."
   },
   {
     id: "c2-119",
@@ -966,5 +966,85 @@ DATA.core2Questions = [
     choices: ["Bias", "Hallucination", "Data privacy breach", "Licensing violation"],
     answer: [1],
     explanation: "A hallucination is when AI generates confident but false or made-up information, so AI output should always be checked for accuracy. Bias refers to skewed or unfair results caused by training data, not invented facts."
+  },
+  {
+    id: "c2-121",
+    domain: "2",
+    q: "Which statement BEST describes a zero trust security model?",
+    choices: ["Never trust, always verify: every access request is authenticated and authorized, regardless of network location", "Devices on the internal corporate network are trusted automatically", "Only remote users need multifactor authentication", "Firewalls are no longer needed"],
+    answer: [0],
+    explanation: "Zero trust removes implicit trust based on location, so every user, device and request is verified. Trusting anything inside the LAN is the traditional perimeter model zero trust replaces."
+  },
+  {
+    id: "c2-122",
+    domain: "2",
+    q: "Which of the following is an example of passwordless authentication?",
+    choices: ["Signing in with a FIDO2 security key or a Windows Hello PIN or biometric tied to the device", "A password plus a code sent by SMS", "Requiring a longer password", "Answering security questions"],
+    answer: [0],
+    explanation: "Passwordless methods replace the password with something like a hardware key, a device-bound PIN or a biometric. A password plus an SMS code is still password-based MFA."
+  },
+  {
+    id: "c2-123",
+    domain: "2",
+    q: "A user on public Wi-Fi wants the browser's DNS lookups encrypted so they cannot be read or altered on the network. Which browser feature should be enabled?",
+    choices: ["Secure DNS (DNS over HTTPS)", "Private browsing mode", "The pop-up blocker", "Clearing the browser cache"],
+    answer: [0],
+    explanation: "Secure DNS sends DNS queries over an encrypted HTTPS connection. Private browsing only avoids saving local history and does not encrypt DNS traffic."
+  },
+  {
+    id: "c2-124",
+    domain: "1",
+    q: "A company wants new laptops shipped straight to remote employees to configure themselves with corporate settings and apps the first time the user signs in, with no technician involved. Which deployment approach is this?",
+    choices: ["Zero-touch deployment", "A clean install from USB media", "Multiboot", "An in-place upgrade"],
+    answer: [0],
+    explanation: "Zero-touch deployment (for example, Windows Autopilot) provisions devices automatically from the cloud at first sign-in. A clean install from USB needs a technician to perform it."
+  },
+  {
+    id: "c2-125",
+    domain: "1",
+    q: "A developer wants to choose between Windows and Linux each time a PC starts, with both operating systems installed on the same computer. What is this setup called?",
+    choices: ["Multiboot", "Zero-touch deployment", "A repair installation", "Image deployment"],
+    answer: [0],
+    explanation: "A multiboot system has several operating systems installed and lets the user pick one from a boot menu at startup."
+  },
+  {
+    id: "c2-126",
+    domain: "1",
+    q: "Apple pushes an urgent macOS security fix that installs quickly between full operating system updates. What is this type of update called?",
+    choices: ["Rapid Security Response", "Time Machine", "Gatekeeper", "FileVault"],
+    answer: [0],
+    explanation: "Rapid Security Responses deliver important security fixes between standard macOS updates. Time Machine is backup, Gatekeeper checks app signing, and FileVault is disk encryption."
+  },
+  {
+    id: "c2-127",
+    domain: "1",
+    q: "A Linux server reports file system errors on an unmounted data partition. Which command checks and repairs the file system?",
+    choices: ["fsck", "mount", "df", "chmod"],
+    answer: [0],
+    explanation: "fsck checks and repairs Linux file systems and should be run on unmounted partitions. df only reports free space, and mount attaches a file system."
+  },
+  {
+    id: "c2-128",
+    domain: "1",
+    q: "A technician attaches a USB drive to a Linux server and needs its file system to be accessible at /mnt/usb. Which command should be used?",
+    choices: ["mount", "fsck", "du", "chown"],
+    answer: [0],
+    explanation: "mount attaches a file system to a directory (mount point). fsck repairs file systems, du reports usage, and chown changes ownership."
+  },
+  {
+    id: "c2-129",
+    domain: "4",
+    q: "Which remote access protocol is commonly used to view and control the desktops of virtual machines, for example in KVM/QEMU environments?",
+    choices: ["SPICE", "SMTP", "SNMP", "LDAP"],
+    answer: [0],
+    explanation: "SPICE (Simple Protocol for Independent Computing Environments) provides remote display and control for virtual machines. SMTP is email, SNMP is device monitoring, and LDAP is directory access."
+  },
+  {
+    id: "c2-130",
+    domain: "1",
+    q: "A company uses a cloud productivity suite and wants employees to sign in to cloud apps with the same username and password as their on-premises Active Directory accounts. What provides this?",
+    choices: ["Identity synchronization", "Folder redirection", "Port forwarding", "A DHCP reservation"],
+    answer: [0],
+    explanation: "Identity synchronization copies on-premises directory accounts (and optionally password hashes) to the cloud identity service so users have one set of credentials. Folder redirection moves user folders to a file server."
   }
 ];

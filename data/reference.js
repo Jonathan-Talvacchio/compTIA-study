@@ -5,9 +5,9 @@ DATA.reference = [
   {
     id: "wifi", title: "Wi-Fi Standards", exam: "core1", cols: ["Standard", "Band(s)", "Max speed (theoretical)", "Notes"],
     rows: [
-      ["802.11a", "5 GHz", "54 Mbps", "OFDM, shorter range"],
-      ["802.11b", "2.4 GHz", "11 Mbps", "Channels 1, 6, 11 don't overlap"],
-      ["802.11g", "2.4 GHz", "54 Mbps", "Backward compatible with b"],
+      ["2.4 GHz band", "—", "—", "Longest range, most interference; channels 1, 6, 11 don't overlap (North America)"],
+      ["5 GHz band", "—", "—", "More channels, faster, shorter range"],
+      ["6 GHz band", "—", "—", "Wi-Fi 6E / Wi-Fi 7 only; wide, uncongested channels, shortest range"],
       ["802.11n (Wi-Fi 4)", "2.4 / 5 GHz", "600 Mbps", "MIMO, channel bonding (40 MHz)"],
       ["802.11ac (Wi-Fi 5)", "5 GHz", "~6.9 Gbps", "MU-MIMO (downlink), 80/160 MHz channels"],
       ["802.11ax (Wi-Fi 6)", "2.4 / 5 GHz", "~9.6 Gbps", "OFDMA, better in dense areas"],
@@ -78,9 +78,7 @@ DATA.reference = [
       ["diskpart", "Disk partitioning shell", "list disk, select, clean, create, format, assign"],
       ["format", "Format a volume", "/fs:NTFS /q /v:label"],
       ["robocopy", "Robust copy", "/e /mir /mov /z"],
-      ["xcopy / copy", "Copy files & trees / files", "xcopy /s /e"],
       ["md / rmdir / cd / dir", "Make, remove, change, list dirs", "rmdir /s /q"],
-      ["shutdown", "Shut down / restart", "/s /r /t secs /a abort /f force"],
       ["winver", "Show Windows version", ""],
       ["[command] /?", "Help for any command", ""]
     ]
@@ -105,6 +103,7 @@ DATA.reference = [
       ["ps / top", "Process snapshot / live view", "ps aux"],
       ["man", "Manual pages", "man chmod"],
       ["du / df", "Folder usage / free space", "du -sh *, df -h"],
+      ["fsck / mount", "Check & repair a file system / attach one to a directory", "fsck /dev/sdb1, mount /dev/sdb1 /mnt/usb"],
       ["nano", "Text editor", "nano file.txt"],
       ["/etc/passwd /etc/shadow", "User accounts / password hashes", ""],
       ["/etc/fstab", "File systems mounted at boot", ""],
@@ -173,7 +172,7 @@ DATA.reference = [
       ["Regulated data", "PII (personal), PHI (health/HIPAA), PCI DSS (card data), GDPR (EU privacy)"],
       ["Licensing", "EULA, per-seat vs concurrent, open-source vs commercial, DRM"],
       ["Scripts", ".bat (cmd), .ps1 (PowerShell), .vbs (VBScript), .sh (bash), .py (Python), .js (JavaScript)"],
-      ["Remote access", "RDP 3389, SSH 22, VNC, VPN, RMM, MSRA (Microsoft Remote Assistance)"],
+      ["Remote access", "RDP 3389, SSH 22, VNC, VPN, RMM, SPICE (VM desktops), screen-sharing tools"],
       ["AI", "Follow your AI policy; watch for bias & hallucinations; don't paste sensitive data into public AI"]
     ]
   },
@@ -182,7 +181,7 @@ DATA.reference = [
     rows: [
       ["OSI layers 1→7", "Please Do Not Throw Sausage Pizza Away (Physical, Data Link, Network, Transport, Session, Presentation, Application)"],
       ["Laser printing", "Please Charge Every Device To Fully Clean (Processing, Charging, Exposing, Developing, Transferring, Fusing, Cleaning)"],
-      ["Troubleshooting", "Identify, Theorize, Test, Plan, Verify, Document — \"I Think That People Value Docs\""],
+      ["Troubleshooting (best practice, not a V15 objective)", "Identify, Theorize, Test, Plan, Verify, Document — \"I Think That People Value Docs\""],
       ["Malware removal", "Investigate, Quarantine, Disable restore, Remediate, Schedule scans, Enable restore, Educate"],
       ["DHCP", "DORA: Discover, Offer, Request, Acknowledge"],
       ["chmod digits", "r=4, w=2, x=1 → 7 = rwx, 5 = r-x, 4 = r--, 6 = rw-"],
