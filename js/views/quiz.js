@@ -68,7 +68,8 @@
       const ok = sameSet(sel, q.answer);
       wrap.appendChild(h("div", { class: "explain " + (ok ? "good" : "bad") },
         h("strong", null, ok ? "✅ Correct! " : `❌ Not quite — answer: ${q.answer.map(a => LETTERS[a]).join(", ")}. `),
-        q.explanation));
+        q.explanation,
+        h("div", { class: "learn-row" }, App.learnMoreButton(q), h("span", { class: "muted" }, ok ? "Notes, a video and related flashcards for this topic." : "Study notes, a video and flashcards for this exact topic."))));
     }
     // Keyboard shortcuts: 1-5 / A-E to choose
     return wrap;
@@ -83,6 +84,12 @@
       if (mode === "daily") return startDaily(root);
       if (mode === "missed") return startMissed(root);
       if (mode === "weak") return startWeak(root);
+      if (mode === "topic") {
+        const t = App.topicById(params[1]);
+        const pool = t ? App.questionsForTopic(t.id) : [];
+        if (!pool.length) return setup(root);
+        return runQuiz(root, pool, { count: Math.min(15, pool.length), label: `📖 ${t.title}` });
+      }
       if (mode === "domain") return runQuiz(root, buildPool(params[1], [params[2]]), { count: 15, label: `${DATA.exams[params[1]].domains[params[2]].name} drill` });
       setup(root);
     }
@@ -297,7 +304,8 @@
           stage.appendChild(h("div", { class: "explain bad", style: { marginBottom: "10px" } },
             h("div", null, h("strong", null, q.q)),
             h("div", { class: "mt" }, "✔ ", q.answer.map(a => q.choices[a]).join(" + ")),
-            h("div", { class: "muted mt" }, q.explanation)));
+            h("div", { class: "muted mt" }, q.explanation),
+            h("div", { class: "mt" }, App.learnMoreButton(q))));
         }
       }
     }
