@@ -37,6 +37,7 @@
           action("📝", "Exam Simulator", "Timed, scored like the real thing (100–900).", () => App.go("exam"))
         ),
 
+        topicsToReview(),
         h("h2", null, "Exam readiness"),
         h("div", { class: "grid cols-2" }, readiness("core1"), readiness("core2"))
       );
@@ -54,6 +55,15 @@
       }
     }
   };
+
+  function topicsToReview() {
+    const weak = App.weakTopics(3);
+    if (!weak.length) return null;
+    return h("div", null, h("h2", null, "📖 Topics to review"),
+      h("div", { class: "grid cols-3" }, weak.map(({ t, m }) => h("button", { class: "card click", onclick: () => App.go("guide/" + t.id) },
+        h("span", { class: "tag", style: { color: "var(--bad)" } }, `${m.missed} missed`), h("h3", { class: "mt" }, t.title),
+        h("p", null, "Read the notes, watch the video, then practice this topic.")))));
+  }
 
   function readiness(exam) {
     const ex = DATA.exams[exam];

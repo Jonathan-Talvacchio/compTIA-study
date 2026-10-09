@@ -57,6 +57,7 @@ window.App = (function () {
     examHistory: [],
     missionsDone: {},
     lessonsDone: {},
+    topicsReviewed: {},
     examFilter: "both",
     theme: "dark"
   });

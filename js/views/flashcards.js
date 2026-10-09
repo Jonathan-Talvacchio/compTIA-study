@@ -1,6 +1,13 @@
 (function () {
   const { h } = App;
 
+  // Small link from the back of a card to its Study Guide topic.
+  function guideLink(c) {
+    const t = App.topicForCard && App.topicForCard(c);
+    if (!t) return null;
+    return h("a", { class: "card-guide", href: "#/guide/" + t.id, onclick: e => e.stopPropagation() }, `📖 Study guide: ${t.title}`);
+  }
+
   App.views.flashcards = {
     title: "Flashcards",
     render(root) {
@@ -75,7 +82,8 @@
               h("div", { class: "muted mt" }, typeIt ? "" : "Click or press Space to flip")),
             h("div", { class: "face back" },
               h("div", { style: { fontSize: "1.15rem", fontWeight: 600 } }, c.back),
-              c.hint ? h("div", { class: "hint" }, "💡 " + c.hint) : null));
+              c.hint ? h("div", { class: "hint" }, "💡 " + c.hint) : null,
+              guideLink(c)));
           const flashStage = h("div", { class: "flash-stage" }, fc);
           stage.appendChild(flashStage);
           const rate = h("div", { class: "rate", style: { visibility: "hidden" } });

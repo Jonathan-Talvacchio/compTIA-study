@@ -23,6 +23,7 @@ It's a static site: plain HTML, CSS and JavaScript, with no build step and no se
 | **Flashcards** | 272 cards using spaced repetition (SM-2 style). Modes: Smart Review, Cram, and Type-It (active recall). Many cards include mnemonics. |
 | **Arcade** | Port Match (timed), Put It In Order (troubleshooting steps, malware removal, laser printing, DORA, OSI…), Sort It Out (Wi-Fi bands, RAID, malware types, cloud models, tools…), Memory Match, Tech Blitz (true/false), Acronym Attack. |
 | **Terminal Lab** | Simulated Windows CMD and Linux bash with a working `nano`/Notepad editor. **Academy:** 11 guided lessons that teach one command at a time. **Command Drill:** type the exact command for a task (60 tasks, graded on syntax). **Missions:** 16 ticket-style scenarios, including APIPA/DHCP, a malware hunt, a hosts-file hijack, Group Policy, DiskPart, robocopy backups, least privilege, tracert/pathping, chmod/chown, log forensics, apt, runaway processes, a full disk, a DNS fix, a USB drive repair with fsck/mount, and a crashed web service. **Free Play:** a sandbox with a searchable command guide. |
+| **Study Guide** | 57 topic pages, one per exam objective area, each with short study notes, the matching free Professor Messer video, official command docs (Microsoft Learn, Linux man pages), related flashcards and a practice quiz. Every answered question has a **📖 Learn more** button that opens this material for that exact question, and the dashboard suggests topics based on the questions you miss. |
 | **Study Lab** | Pomodoro timer, a Feynman-style teach-back mode (40 prompts with key-point self-checks), a daily goal setting, and a suggested study plan. |
 | **Cheat Sheets** | Searchable tables: ports, Wi-Fi, RAID, cabling, Windows tools and commands, Linux commands, file systems, cloud, security, operational procedures, and mnemonics. |
 | **Progress** | Badges, personal bests, exam history, and progress export/import/reset. |
@@ -46,6 +47,7 @@ js/terminal/          shell engine + virtual FS + editor (shell.js), windows.js,
 - **Questions:** append to `DATA.core1Questions` / `DATA.core2Questions`. Each question needs `id`, `domain` ("1"–"5"), `q`, `choices`, `answer` (an array of indices) and `explanation`. Multi-answer questions just have more than one index in `answer`.
 - **Flashcards:** append to `DATA.flashcards` (`id`, `exam`, `domain`, `front`, `back`, optional `hint`).
 - **Games:** add entries to `DATA.orderPuzzles`, `DATA.sortPuzzles`, `DATA.truefalse` or `DATA.acronyms` in `data/games.js`.
+- **Study Guide topics:** add to `DATA.topics` in `data/topics.js` (`id`, `exam`, `domain`, `obj`, `title`, `video` slug, `notes`, `keywords`, optional `docs`). Questions and flashcards are matched to topics by keywords; to pin a question to a topic, add it to `DATA.topicOverrides`.
 - **Terminal missions:** add to `App.missions` in `js/terminal/missions.js`. Each mission has a `setup(world)` function and objectives whose `check(ctx)` runs after every command.
 
 ## Sources and verification
