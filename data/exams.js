@@ -13,7 +13,7 @@ DATA.exams = {
       "1": { name: "Mobile Devices", weight: 13, icon: "📱" },
       "2": { name: "Networking", weight: 23, icon: "🌐" },
       "3": { name: "Hardware", weight: 25, icon: "🖥️" },
-      "4": { name: "Virtualization & Cloud", weight: 11, icon: "☁️" },
+      "4": { name: "Virtualization & Cloud Computing", weight: 11, icon: "☁️" },
       "5": { name: "Hardware & Network Troubleshooting", weight: 28, icon: "🛠️" }
     }
   },

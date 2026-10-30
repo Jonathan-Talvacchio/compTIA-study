@@ -161,7 +161,7 @@ DATA.sortPuzzles = [
     buckets: ["Full", "Incremental", "Differential", "Synthetic"],
     items: [
       ["Backs up everything; slowest to create", 0], ["Restore needs only one set", 0],
-      ["Backs up changes since the last backup of any kind", 1], ["Restore needs full + every one since", 1],
+      ["Backs up changes since the last full or incremental backup", 1], ["Restore needs full + every one since", 1],
       ["Backs up changes since the last full", 2], ["Restore needs full + latest one only", 2],
       ["Built by combining a full with later incrementals", 3], ["Creates a new 'full' without re-reading the source", 3]
     ]
