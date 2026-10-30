@@ -826,10 +826,10 @@ DATA.core2Questions = [
   {
     id: "c2-103",
     domain: "4",
-    q: "An administrator needs the shortest possible nightly backup window and wants each job to copy only the data that changed since the last backup of any type. Which backup type should be used?",
+    q: "An administrator needs the shortest possible nightly backup window and wants each nightly job to copy only the data that changed since the previous night's backup. Which backup type should be used?",
     choices: ["Full", "Differential", "Incremental", "Synthetic full"],
     answer: [2],
-    explanation: "Incremental backups copy only changes since the last backup of any type, which makes them the fastest and smallest. Differential backups grow each day because they copy all changes since the last full backup."
+    explanation: "Incremental backups copy only the changes since the last full or incremental backup, which makes them the fastest and smallest. Differential backups grow each day because they copy all changes since the last full backup."
   },
   {
     id: "c2-104",

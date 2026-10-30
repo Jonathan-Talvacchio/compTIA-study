@@ -162,7 +162,7 @@ DATA.reference = [
   {
     id: "ops", title: "Operational Procedures", exam: "core2", cols: ["Topic", "Remember"],
     rows: [
-      ["Backups", "Full / incremental (since last backup) / differential (since last full) / synthetic"],
+      ["Backups", "Full / incremental (since last full or incremental) / differential (since last full) / synthetic"],
       ["3-2-1 rule", "3 copies, 2 different media, 1 off-site"],
       ["GFS", "Grandfather-father-son rotation (monthly / weekly / daily)"],
       ["Change management", "Request → purpose/scope → risk analysis → rollback plan → sandbox test → CAB approval → implement → end-user acceptance"],
