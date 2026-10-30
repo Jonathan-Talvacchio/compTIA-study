@@ -159,15 +159,15 @@ DATA.core1Questions = [
     id: "c1-020",
     domain: "2",
     q: "A technician is configuring a firewall between client workstations and a DHCP server. Which ports must be allowed so clients can obtain IP addresses?",
-    choices: ["TCP 20 and 21", "UDP 67 and 68", "UDP 161 and 162", "TCP 137 and 139"],
+    choices: ["TCP 20 and 21", "UDP 67 and 68", "TCP 80 and 443", "TCP 137 and 139"],
     answer: [1],
-    explanation: "DHCP uses UDP 67 (server) and UDP 68 (client). Ports 20/21 are FTP, 161/162 are SNMP, and 137-139 are NetBIOS."
+    explanation: "DHCP uses UDP 67 (server) and UDP 68 (client). Ports 20/21 are FTP, 80/443 are HTTP/HTTPS, and 137-139 are NetBIOS."
   },
   {
     id: "c1-021",
     domain: "2",
     q: "An application must query a company's directory service to look up user accounts and group memberships. Which protocol and default port will it use?",
-    choices: ["SNMP on port 161", "SMB on port 445", "RDP on port 3389", "LDAP on port 389"],
+    choices: ["HTTPS on port 443", "SMB on port 445", "RDP on port 3389", "LDAP on port 389"],
     answer: [3],
     explanation: "LDAP (Lightweight Directory Access Protocol) uses port 389 to query directory services such as Active Directory. SMB on 445 is for file and printer sharing, not directory queries."
   },

@@ -61,9 +61,9 @@ DATA.core2Questions = [
     id: "c2-008",
     domain: "1",
     q: "A technician needs to copy a large directory tree to a new file server, keep the NTFS permissions, and be able to resume the copy if the network connection drops. Which command is the BEST choice?",
-    choices: ["copy", "xcopy", "move", "robocopy"],
+    choices: ["net use", "md", "move", "robocopy"],
     answer: [3],
-    explanation: "Robocopy (Robust File Copy) can copy security/ACLs (/COPYALL or /SEC), mirror trees, and resume in restartable mode (/Z). xcopy copies directory trees but lacks robocopy's resilience and retry features."
+    explanation: "Robocopy (Robust File Copy) can copy security/ACLs (/COPYALL or /SEC), mirror trees, retry failed files, and resume in restartable mode (/Z). net use only maps a drive to a share, md creates a directory, and move relocates files without robocopy's restartable, retrying copy features."
   },
   {
     id: "c2-009",
