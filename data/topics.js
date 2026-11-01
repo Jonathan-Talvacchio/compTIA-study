@@ -85,7 +85,7 @@ window.DATA = window.DATA || {};
       "IPv6 addresses are 128-bit, written in hex; link-local addresses start with fe80::."
     ], ["ipv4", "ipv6", "apipa", "169.254", "private ip", "subnet mask", "default gateway", "static ip", "rfc 1918", "nat", "ip address"]),
     T("core1", "2", "2.7", "connection-types", "Internet connection & network types", "internet-connection-types-220-1201", [
-      "Connections: fiber (fastest), cable (coax), DSL (phone line), satellite (high latency), cellular, WISP (fixed wireless from a tower).",
+      "Connections: fiber (fastest), cable (coax), DSL (phone line), satellite (high latency on geostationary; lower on LEO), cellular, WISP (fixed wireless from a tower).",
       "Network types: LAN, WAN, PAN (Bluetooth range), MAN (city-wide), SAN (block storage network), WLAN (wireless LAN)."
     ], ["fiber", "dsl", "satellite", "wisp", "cable internet", "lan", "wan", "pan", "man", "san", "wlan", "isp"]),
     T("core1", "2", "2.8", "network-tools", "Networking tools", "network-tools-220-1201", [
@@ -131,7 +131,7 @@ window.DATA = window.DATA || {};
       "Modular PSUs let you attach only the cables you need; redundant hot-swappable PSUs keep servers running.",
       "Some PSUs have a manual 115/230 V input switch — set it correctly for the country."
     ], ["power supply", "psu", "wattage", "24-pin", "12 v", "modular", "redundant", "230 v", "115 v", "80 plus"]),
-    T("core1", "3", "3.8", "printers", "Printers & multifunction devices", null, [
+    T("core1", "3", "3.7–3.8", "printers", "Printers & multifunction devices", null, [
       "Laser imaging process: Processing, Charging, Exposing, Developing, Transferring, Fusing, Cleaning.",
       "The fuser uses heat and pressure to bond toner; the imaging drum holds the image.",
       "Inkjet: print heads and cartridges; thermal: heat-sensitive paper (receipts); impact (dot matrix): multipart carbon forms; 3D: plastic filament or resin.",
@@ -275,7 +275,7 @@ window.DATA = window.DATA || {};
     T("core2", "2", "2.8", "mobile-security", "Mobile device security", "mobile-device-security-220-1202", [
       "Screen locks (PIN, biometrics), full-device encryption, OS updates, locator apps, remote wipe.",
       "MDM enforces policies and configuration profiles; BYOD needs clear policies and containers.",
-      "iOS installs apps only from the App Store; Android allows other sources (riskier)."
+      "iOS installs apps from the App Store (alternative marketplaces only in some regions, e.g., the EU); Android allows other sources (riskier)."
     ], ["screen lock", "remote wipe", "locator", "find my", "mobile security", "lost", "stolen", "biometric", "pin"]),
     T("core2", "2", "2.9", "data-destruction", "Data destruction & disposal", "data-destruction-220-1202", [
       "Physical: shredding, drilling, incineration, degaussing (magnetic HDDs only — not SSDs).",
@@ -319,7 +319,7 @@ window.DATA = window.DATA || {};
       "Implement in the change window, confirm end-user acceptance, document."
     ], ["change management", "change request", "change board", "advisory board", "rollback", "sandbox test", "risk analysis", "scope", "end-user acceptance"]),
     T("core2", "4", "4.3", "backups", "Backups & recovery", null, [
-      "Full = everything; incremental = changes since the last backup of any kind (fast backup, slow restore); differential = changes since the last full.",
+      "Full = everything; incremental = changes since the last full or incremental backup (fast backup, slow restore); differential = changes since the last full.",
       "Synthetic full = built from a full plus incrementals on the backup server.",
       "3-2-1: three copies, two media types, one off-site. GFS rotation (grandfather-father-son). Test restores regularly."
     ], ["backup", "incremental", "differential", "synthetic", "3-2-1", "gfs", "off-site", "restore"]),

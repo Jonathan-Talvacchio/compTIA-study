@@ -61,9 +61,9 @@ DATA.core2Questions = [
     id: "c2-008",
     domain: "1",
     q: "A technician needs to copy a large directory tree to a new file server, keep the NTFS permissions, and be able to resume the copy if the network connection drops. Which command is the BEST choice?",
-    choices: ["copy", "xcopy", "move", "robocopy"],
+    choices: ["net use", "md", "move", "robocopy"],
     answer: [3],
-    explanation: "Robocopy (Robust File Copy) can copy security/ACLs (/COPYALL or /SEC), mirror trees, and resume in restartable mode (/Z). xcopy copies directory trees but lacks robocopy's resilience and retry features."
+    explanation: "Robocopy (Robust File Copy) can copy security/ACLs (/COPYALL or /SEC), mirror trees, retry failed files, and resume in restartable mode (/Z). net use only maps a drive to a share, md creates a directory, and move relocates files without robocopy's restartable, retrying copy features."
   },
   {
     id: "c2-009",
@@ -826,10 +826,10 @@ DATA.core2Questions = [
   {
     id: "c2-103",
     domain: "4",
-    q: "An administrator needs the shortest possible nightly backup window and wants each job to copy only the data that changed since the last backup of any type. Which backup type should be used?",
+    q: "An administrator needs the shortest possible nightly backup window and wants each nightly job to copy only the data that changed since the previous night's backup. Which backup type should be used?",
     choices: ["Full", "Differential", "Incremental", "Synthetic full"],
     answer: [2],
-    explanation: "Incremental backups copy only changes since the last backup of any type, which makes them the fastest and smallest. Differential backups grow each day because they copy all changes since the last full backup."
+    explanation: "Incremental backups copy only the changes since the last full or incremental backup, which makes them the fastest and smallest. Differential backups grow each day because they copy all changes since the last full backup."
   },
   {
     id: "c2-104",

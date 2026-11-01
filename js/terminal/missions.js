@@ -110,7 +110,7 @@
         { text: "Run the script", hint: "./backup.sh", check: c => (c.w.flags.ranScript || []).includes("backup.sh") },
         { text: "Change the owner of /var/www/html/index.html to www-data (needs elevation)", hint: "sudo chown www-data /var/www/html/index.html", check: c => { const n = c.w.fs.get(["var", "www", "html", "index.html"]); return n && n.owner === "www-data"; } }
       ],
-      debrief: "Linux permissions are rwx for owner/group/others. r=4, w=2, x=1 — so 755 = rwxr-xr-x. chmod changes permissions, chown changes ownership (and normally needs sudo). A script needs the execute bit to run as ./script."
+      debrief: "Linux permissions are rwx for owner/group/others. r=4, w=2, x=1 — so 755 = rwxr-xr-x. chmod changes permissions, chown changes ownership (which requires root, so use sudo). A script needs the execute bit to run as ./script."
     },
     {
       id: "lx-logs", os: "linux", title: "Log Detective", difficulty: "Medium", objective: "Core 2 1.9 / 2.x",
@@ -235,7 +235,7 @@
         { text: "List the files on the drive", hint: "ls /mnt/data", check: c => c.cmd === "ls" && c.out.includes("survey-2026.csv") },
         { text: "Confirm it shows up in the disk usage report", hint: "df -h", check: c => c.cmd === "df" && c.out.includes("/mnt/data") }
       ],
-      debrief: "lsblk lists disks and partitions. A drive pulled out without unmounting can be left with file system errors, so mount refuses it. fsck checks and repairs a file system — always on an unmounted partition. mount attaches a partition to a directory (umount detaches it), and entries in /etc/fstab make mounts permanent."
+      debrief: "lsblk lists disks and partitions. A drive pulled out without unmounting can be left with file system errors (here bad enough that mount refuses it). fsck checks and repairs a file system — always on an unmounted partition. mount attaches a partition to a directory (umount detaches it), and entries in /etc/fstab make mounts permanent."
     },
     {
       id: "lx-web", os: "linux", title: "The Website Is Down", difficulty: "Easy", objective: "Core 2 1.9 / 3.x",

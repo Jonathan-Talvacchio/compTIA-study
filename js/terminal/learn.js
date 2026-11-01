@@ -57,7 +57,7 @@
       steps: [
         { teach: "`hostname` prints the computer's name — handy for tickets and remote support.", task: "Show this PC's name.", hint: "hostname",
           check: c => c.cmd === "hostname", after: "" },
-        { teach: "`whoami` shows the signed-in account as DOMAIN\\user.", task: "Show who you're signed in as.", hint: "whoami",
+        { teach: "`whoami` shows the signed-in account as DOMAIN\\user (or COMPUTERNAME\\user for a local account).", task: "Show who you're signed in as.", hint: "whoami",
           check: c => c.cmd === "whoami", after: "`whoami /groups` lists group memberships — useful for permission problems." },
         { teach: "`winver` opens the About Windows box with the version and build number.", task: "Show the Windows version.", hint: "winver",
           check: c => c.cmd === "winver", after: "Build numbers tell you which feature update is installed." },
@@ -155,7 +155,7 @@
           check: c => c.cmd === "cat" && c.lower.includes("shadow") && !c.line.startsWith("sudo"), after: "" },
         { teach: "`sudo` runs one command as root. You must be allowed to (a member of the sudo group) and it asks for YOUR password.", task: "Read /etc/shadow with sudo.", hint: "sudo cat /etc/shadow",
           check: c => c.line.startsWith("sudo") && c.out.includes("root:"), after: "`su` switches to another user's shell entirely and asks for THAT user's password. sudo is preferred because it's logged and limited." },
-        { teach: "`chown` changes a file's owner and usually needs sudo.", task: "Make root the owner of notes.txt.", hint: "sudo chown root notes.txt",
+        { teach: "`chown` changes a file's owner. Only root can give a file to another user, so it needs sudo.", task: "Make root the owner of notes.txt.", hint: "sudo chown root notes.txt",
           check: c => { const n = c.w.fs.get(["home", "student", "notes.txt"]); return n && n.owner === "root"; }, after: "`chown user:group file` sets both at once." }
       ]
     },
@@ -164,7 +164,7 @@
       blurb: "Search inside files, search for files, and chain commands together.",
       steps: [
         { teach: "`grep PATTERN FILE` prints matching lines. `-i` ignores case. System logs need elevation to read.", task: "Find lines containing \"error\" (any case) in /var/log/syslog.", hint: "sudo grep -i error /var/log/syslog",
-          check: c => c.cmd === "grep" && c.lower.includes("error") && c.lower.includes("syslog") && c.out.includes("nginx"), after: "`-n` adds line numbers, `-v` shows lines that DON'T match, and `-c` counts matches." },
+          check: c => c.cmd === "grep" && c.lower.includes("error") && c.lower.includes("syslog") && c.out.includes("nginx"), after: "`-n` adds line numbers, `-v` shows lines that DON'T match, and `-c` counts matching lines." },
         { teach: "`grep -r` searches every file in a directory tree and prefixes each match with its file name.", task: "Search your home folder recursively for TODO.", hint: "grep -r TODO ~",
           check: c => c.cmd === "grep" && c.args.some(a => /^-[a-z]*r/i.test(a)) && /TODO/.test(c.out), after: "Great for finding which config file sets a value." },
         { teach: "`find PATH -name PATTERN` searches for files by name. Quote wildcards.", task: "Find every .conf file under /etc.", hint: "find /etc -name \"*.conf\"",
@@ -267,10 +267,10 @@
       { q: "Reapply every Group Policy setting right now.", a: "gpupdate /force", ok: re(/^gpupdate \/force$/) },
       { q: "Show a summary of the Group Policy applied to you (RSoP).", a: "gpresult /r", ok: re(/^gpresult \/r$/) },
       { q: "Scan and repair protected Windows system files.", a: "sfc /scannow", ok: re(/^sfc \/scannow$/) },
-      { q: "Check drive D: and fix any file system errors.", a: "chkdsk d: /f", ok: re(/^chkdsk d: \/[fr]$/) },
+      { q: "Check drive D: and fix any file system errors.", a: "chkdsk d: /f", ok: re(/^chkdsk d: (\/f|\/r|\/f \/r|\/r \/f)$/) },
       { q: "Open the command-line disk partitioning tool.", a: "diskpart", ok: re(/^diskpart$/) },
       { q: "Quick-format drive E: as NTFS.", a: "format e: /fs:ntfs /q", ok: n => /^format e:( \/fs:ntfs| \/q){2}$/.test(n) && n.includes("/q") && n.includes("/fs:ntfs") },
-      { q: "Copy C:\\Data to D:\\Data, including all subfolders, with the robust copy tool.", a: "robocopy C:\\Data D:\\Data /E", ok: re(/^robocopy c:\\data d:\\data \/(e|mir|s)$/) },
+      { q: "Copy C:\\Data to D:\\Data, including all subfolders, with the robust copy tool.", a: "robocopy C:\\Data D:\\Data /E", ok: re(/^robocopy c:\\data d:\\data \/(e|mir)$/) },
       { q: "Map drive S: to the share \\\\fileserver\\sales.", a: "net use S: \\\\fileserver\\sales", ok: re(/^net use s: \\\\fileserver\\sales$/) },
       { q: "Disconnect mapped drive S:.", a: "net use S: /delete", ok: re(/^net use s: \/d(elete)?$/) },
       { q: "List the shared folders on \\\\fileserver.", a: "net view \\\\fileserver", ok: re(/^net view \\\\fileserver$/) },
